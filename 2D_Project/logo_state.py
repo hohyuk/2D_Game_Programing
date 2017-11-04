@@ -1,5 +1,6 @@
 from pico2d import *
 import Game_FrameWork
+import first_stage_state
 
 name = "LogoState"
 
@@ -59,6 +60,8 @@ def handle_events():
         else:
             if (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
                 Game_FrameWork.quit()
+            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_RETURN):         # enter key
+                Game_FrameWork.change_state(first_stage_state)
 
 
 def pause():
