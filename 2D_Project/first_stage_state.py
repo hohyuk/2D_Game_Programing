@@ -13,18 +13,28 @@ background = None
 
 class BackGround:
     def __init__(self):
-        self.image = load_image('image\stage\stage1_01.png')
+        self.image1 = load_image('image\stage\stage1_01.png')
+        self.image2 = load_image('image\stage\stage1_02.png')
+        self.image3 = load_image('image\stage\stage1_03.png')
         self.width = 800
         self.height = 6000
-        self.x, self.y= self.width / 2, self.height / 2            # 화면 초기값.
-        self.move = 0.5
+
+        self.x1, self.y1 = self.width / 2, self.height / 2           # 화면 초기값. stage1_01 초기값.
+        self.x2, self.y2 = self.width / 2, self.height / 2 + 600
+
+        self.move = 2
 
     def update(self):
-        if self.y > -(self.height / 2):
-            self.y -= self.move
+        if self.y1 > -(self.height / 2):
+            self.y1 -= self.move
+        if self.y1 < -(self.height / 2)+600:
+            self.y2 -= self.move
+
 
     def draw(self):
-        self.image.clip_draw(0, 0, self.width, self.height, self.x, self.y)
+        self.image1.clip_draw(0, 0, self.width, self.height, self.x1, self.y1)
+        self.image2.clip_draw(0, 0, self.width, self.height, self.x2, self.y2)
+        #self.image3.clip_draw(0, 0, self.width, self.height, self.x, self.y)
 
 
 def enter():
