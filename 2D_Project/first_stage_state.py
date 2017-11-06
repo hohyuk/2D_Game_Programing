@@ -20,21 +20,22 @@ class BackGround:
         self.height = 6000
 
         self.x1, self.y1 = self.width / 2, self.height / 2           # 화면 초기값. stage1_01 초기값.
-        self.x2, self.y2 = self.width / 2, self.height / 2 + 600
-
-        self.move = 2
+        self.x2, self.y2 = self.width / 2, self.height / 2 + 600     # stage1_02화면 초기값.
+        self.x3, self.y3 = self.width / 2, self.height / 2 + 600     # stage1_02화면 초기값.
+        self.move = 0.5
 
     def update(self):
         if self.y1 > -(self.height / 2):
             self.y1 -= self.move
         if self.y1 < -(self.height / 2)+600:
             self.y2 -= self.move
-
+        if (self.y2 < -(self.height / 2) + 600) and (self.y3 > -(self.height / 2) + 600):
+            self.y3 -= self.move
 
     def draw(self):
         self.image1.clip_draw(0, 0, self.width, self.height, self.x1, self.y1)
         self.image2.clip_draw(0, 0, self.width, self.height, self.x2, self.y2)
-        #self.image3.clip_draw(0, 0, self.width, self.height, self.x, self.y)
+        self.image3.clip_draw(0, 0, self.width, self.height, self.x3, self.y3)
 
 
 def enter():
