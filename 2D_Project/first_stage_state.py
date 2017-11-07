@@ -3,12 +3,13 @@ import os
 from pico2d import *
 
 import Game_FrameWork
-
+import pause_state
 
 name = "FirstStageState"
 
 
 background = None
+player = None
 
 
 class BackGround:
@@ -38,23 +39,38 @@ class BackGround:
         self.image3.clip_draw(0, 0, self.width, self.height, self.x3, self.y3)
 
 
+class Player:
+    def __init__(self):
+        self.image = load_image('image\player\player.png')
+
+    def draw(self):
+        self.image.draw(400, 300)
+
+
 def enter():
-    global background
+    global background, player
     background = BackGround()
+    player = Player()
 
 
 def exit():
-    global background
+    global background, player
     del background
+    del player
 
 
 def update():
     background.update()
 
 
+def draw_stage_scene():
+    background.draw()
+    player.draw()
+
+
 def draw():
     clear_canvas()
-    background.draw()
+    draw_stage_scene()
     update_canvas()
 
 
@@ -63,9 +79,8 @@ def handle_events():
     for event in events:
         if event.type == SDL_QUIT:
             Game_FrameWork.quit()
-        else:
-            if (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
-                Game_FrameWork.quit()
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
+                Game_FrameWork.push_state(pause_state)
 
 
 def pause():
@@ -74,3 +89,4 @@ def pause():
 
 def resume():
     pass
+
