@@ -40,11 +40,26 @@ class BackGround:
 
 
 class Player:
+    STAND, FORWARD, RIGHT, LEFT = 0, 1, 2, 3
+
     def __init__(self):
         self.image = load_image('image\player\player.png')
+        self.frame = 0
+        self.state = self.STAND
+        self.x, self.y = 400, 90
+
+    def handle_event(self, event):
+        if (event.type, event.key) == (SDL_KEYDOWN, SDLK_UP):
+            if self.state in (self.STAND, self.LEFT, self.RIGHT):
+                self.state = self.FORWARD
+        pass
+
+    def update(self):
+        self.frame = (self.frame + 1) % 3
+        pass
 
     def draw(self):
-        self.image.draw(400, 300)
+        self.image.clip_draw(self.frame * 64, 0, 64, 64,self.x, self.y)
 
 
 def enter():
@@ -61,6 +76,7 @@ def exit():
 
 def update():
     background.update()
+    player.update()
 
 
 def draw_stage_scene():
@@ -75,12 +91,15 @@ def draw():
 
 
 def handle_events():
+    global player
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
             Game_FrameWork.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
                 Game_FrameWork.push_state(pause_state)
+        else:
+            player.handle_event(event)
 
 
 def pause():
