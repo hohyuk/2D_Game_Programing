@@ -1,4 +1,10 @@
 # 파일 앞에 숫자는 못온다. 예) 2D_Game_FrameWork.py
+import time
+
+Width = 800
+Height =600
+
+
 class GameState:
     def __init__(self, state):
         self.enter = state.enter
@@ -26,14 +32,14 @@ class TestGameState:
     def resume(self):
         print("State [%s] Resumed." % self.name)
 
-    def handle_events(self):
-        print("State [%s] handle_events." % self.name)
+    def handle_events(self, frame_time):
+        print("State [%s] handle_events." % (self.name, frame_time))
 
-    def update(self):
-        print("State [%s] update." % self.name)
+    def update(self, frame_time):
+        print("State [%s] update." % (self.name, frame_time))
 
-    def draw(self):
-        print("State [%s] draw." % self.name)
+    def draw(self, frame_time):
+        print("State [%s] draw." % (self.name, frame_time))
 
 
 running = None
@@ -74,14 +80,21 @@ def run(start_state):
     running = True
     stack = [start_state]
     start_state.enter()
+    current_time = time.clock()
     while running:
-        stack[-1].handle_events()
-        stack[-1].update()
-        stack[-1].draw()
+        frame_time = time.clock() - current_time
+        current_time += frame_time
+        stack[-1].handle_events(frame_time)
+        stack[-1].update(frame_time)
+        stack[-1].draw(frame_time)
 
     while len(stack) > 0:
         stack[-1].exit()
         stack.pop()
+
+def reset_time():
+    global current_time
+    current_time = time.clock()
 
 
 def test_game_framework():

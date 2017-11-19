@@ -2,8 +2,12 @@ import json
 import os
 from pico2d import *
 
+from Player import Player   # import Player class from Player.py
+
 import Game_FrameWork
 import pause_state
+
+
 
 name = "FirstStageState"
 
@@ -11,13 +15,12 @@ name = "FirstStageState"
 background = None
 player = None
 
-
 class BackGround:
     def __init__(self):
         self.image1 = load_image('image\stage\stage1_01.png')
         self.image2 = load_image('image\stage\stage1_02.png')
         self.image3 = load_image('image\stage\stage1_03.png')
-        self.width = 800
+        self.width = Game_FrameWork.Width
         self.height = 6000
 
         self.x1, self.y1 = self.width / 2, self.height / 2           # 화면 초기값. stage1_01 초기값.
@@ -25,7 +28,7 @@ class BackGround:
         self.x3, self.y3 = self.width / 2, self.height / 2 + 600     # stage1_02화면 초기값.
         self.move = 0.5
 
-    def update(self):
+    def update(self, frame_time):
         if self.y1 > -(self.height / 2):
             self.y1 -= self.move
         if self.y1 < -(self.height / 2)+600:
@@ -39,33 +42,15 @@ class BackGround:
         self.image3.clip_draw(0, 0, self.width, self.height, self.x3, self.y3)
 
 
-class Player:
-    STAND, FORWARD, RIGHT, LEFT = 0, 1, 2, 3
-
-    def __init__(self):
-        self.image = load_image('image\player\player.png')
-        self.frame = 0
-        self.state = self.STAND
-        self.x, self.y = 400, 90
-
-    def handle_event(self, event):
-        if (event.type, event.key) == (SDL_KEYDOWN, SDLK_UP):
-            if self.state in (self.STAND, self.LEFT, self.RIGHT):
-                self.state = self.FORWARD
-        pass
-
-    def update(self):
-        self.frame = (self.frame + 1) % 3
-        pass
-
-    def draw(self):
-        self.image.clip_draw(self.frame * 64, 0, 64, 64,self.x, self.y)
-
-
-def enter():
+def create_ojbect():
     global background, player
     background = BackGround()
     player = Player()
+
+
+def enter():
+    Game_FrameWork.reset_time()
+    create_ojbect()
 
 
 def exit():
@@ -74,9 +59,10 @@ def exit():
     del player
 
 
-def update():
-    background.update()
-    player.update()
+def update(frame_time):
+    background.update(frame_time)
+    player.update(frame_time)
+
 
 
 def draw_stage_scene():
@@ -84,13 +70,13 @@ def draw_stage_scene():
     player.draw()
 
 
-def draw():
+def draw(frame_time):
     clear_canvas()
     draw_stage_scene()
     update_canvas()
 
 
-def handle_events():
+def handle_events(frame_time):
     global player
     events = get_events()
     for event in events:

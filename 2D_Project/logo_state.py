@@ -40,11 +40,11 @@ def exit():
     del button
 
 
-def update():
+def update(frame_time):
     button.update()
 
 
-def draw():
+def draw(frame_time):
     clear_canvas()
     logo.draw()
     if button.flash_count < 300:
@@ -52,7 +52,7 @@ def draw():
     update_canvas()
 
 
-def handle_events():
+def handle_events(frame_time):
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
