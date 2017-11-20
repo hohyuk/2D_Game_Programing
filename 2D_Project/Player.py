@@ -38,7 +38,7 @@ class Player:
                 self.xDir = 0
                 self.yDir = 0
         # 아래
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_DOWN):
+        if (event.type, event.key) == (SDL_KEYDOWN, SDLK_DOWN):
             if self.state in (self.STAND, self.LEFT, self.RIGHT):
                 self.state = self.STAND
                 self.yDir = -1
@@ -48,7 +48,7 @@ class Player:
                 self.xDir = 0
                 self.yDir = 0
         # 왼쪽
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_LEFT):
+        if (event.type, event.key) == (SDL_KEYDOWN, SDLK_LEFT):
             if self.state in (self.STAND, self.FORWARD, self.RIGHT):
                 self.state = self.LEFT
                 self.xDir = -1
@@ -58,7 +58,7 @@ class Player:
                 self.xDir = 0
                 self.yDir = 0
         # 오른쪽
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_RIGHT):
+        if (event.type, event.key) == (SDL_KEYDOWN, SDLK_RIGHT):
             if self.state in (self.STAND, self.FORWARD, self.LEFT):
                 self.state = self.RIGHT
                 self.xDir = 1
