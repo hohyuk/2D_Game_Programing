@@ -1,6 +1,7 @@
 import random
 
 from pico2d import *
+
 import Game_FrameWork
 
 
@@ -23,8 +24,12 @@ class Player:
         self.x, self.y = 400, 90
         self.xDir, self. yDir = 0, 0
 
-        if Player.image == None :
-            Player.image = load_image('image\player\player.png')
+        Player.image = load_image('image/player/player.png')
+
+
+    def get_pos(self):
+        print(self.x,self.y)
+        return self.x, self.y
 
     def handle_event(self, event):
         # 위

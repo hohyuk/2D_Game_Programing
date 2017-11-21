@@ -2,7 +2,7 @@
 import time
 
 Width = 800
-Height =600
+Height = 600
 
 
 class GameState:
