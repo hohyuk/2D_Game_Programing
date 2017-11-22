@@ -20,9 +20,6 @@ class Bullet:
         else :
             return False
 
-
-        pass
-
     def get_bb(self):
         return self.x - 24, self.y - 24, self.x + 24, self.y + 24
 
@@ -31,3 +28,21 @@ class Bullet:
 
     def draw(self):
         self.image.draw(self.x, self.y)
+
+
+class EnummyBullet(Bullet):
+    image = None
+
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+        EnummyBullet.image = load_image('image/bullet/Bullet_Enemy01.png')
+
+    def update(self, frame_time):
+        enumy_bullet_distance = Bullet.BULLET_SPEED * frame_time
+
+    def get_bb(self):
+        return self.x - 24, self.y - 24, self.x + 24, self.y + 24
+
+    def draw_bb(self):
+        draw_rectangle(*self.get_bb())
