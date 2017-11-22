@@ -137,7 +137,7 @@ def update(frame_time):
 
     for enemise in ENEMiES :
         isDel = enemise.update(frame_time)
-        if e_bulletTime > 2:
+        if e_bulletTime > 4:
             enemy_bullet = EnummyBullet(*enemise.get_pos())
             ENEMY_BULLETS.append(enemy_bullet)
             e_bulletTime = 0
