@@ -86,6 +86,12 @@ class Player:
         self.y = clamp((Player.PLAYER_SIZE / 2), self.y, Game_FrameWork.Height-(Player.PLAYER_SIZE / 2))
         pass
 
+    def get_bb(self):
+        return self.x - 25, self.y - 25, self.x + 25, self.y + 25
+
+    def draw_bb(self):
+        draw_rectangle(*self.get_bb())
+
     def draw(self):
         self.image.clip_draw(self.frame * Player.PLAYER_SIZE, self.state * Player.PLAYER_SIZE
                              , Player.PLAYER_SIZE, Player.PLAYER_SIZE,self.x, self.y)

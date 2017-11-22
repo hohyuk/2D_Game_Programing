@@ -4,7 +4,7 @@ import Game_FrameWork
 
 
 class Bullet:
-    BULLET_SPEED = 500
+    BULLET_SPEED = 600
     image = None
 
     def __init__(self, x, y):
@@ -21,7 +21,7 @@ class Bullet:
             return False
 
     def get_bb(self):
-        return self.x - 24, self.y - 24, self.x + 24, self.y + 24
+        return self.x - 15, self.y - 20, self.x + 15, self.y + 20
 
     def draw_bb(self):
         draw_rectangle(*self.get_bb())
@@ -39,10 +39,15 @@ class EnummyBullet(Bullet):
         EnummyBullet.image = load_image('image/bullet/Bullet_Enemy01.png')
 
     def update(self, frame_time):
-        enumy_bullet_distance = Bullet.BULLET_SPEED * frame_time
+        enemy_bullet_distance = Bullet.BULLET_SPEED * frame_time
+        self.y -= enemy_bullet_distance
+        if self.y < 50 :
+            return True
+        else :
+            return False
 
     def get_bb(self):
-        return self.x - 24, self.y - 24, self.x + 24, self.y + 24
+        return self.x - 10, self.y - 10, self.x + 10, self.y + 10
 
     def draw_bb(self):
         draw_rectangle(*self.get_bb())
