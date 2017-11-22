@@ -4,6 +4,7 @@ from pico2d import *
 
 from Player import Player   # import Player class from Player.py
 from Bullet import Bullet
+from Enemy import Enemy
 
 import Game_FrameWork
 import pause_state
@@ -12,16 +13,44 @@ import pause_state
 
 name = "FirstStageState"
 
-
+my_timer = None
 background = None
 player = None
 player_bullet = None
+enemy = None
 
 # List
 PLAYER_BULLETS = None
+ENEMiES = None
 
 isBullet_On = False
 bulletTime = 0
+
+#-----------------------------------------------------------------------------------------------------------
+class Timer :
+
+    def __init__(self):
+        self.time = 0.0
+        self.timer = 0.0
+        self.min = 0.0
+        self.sec = 0.0
+
+    def create_enemy(self):
+        global enemy
+        if self.time >= 2.0 :
+            enemy = Enemy()
+            ENEMiES.append(enemy)
+
+    def update(self,frame_time):
+        self.timer += frame_time
+        self.time += frame_time
+        self.min = int(self.timer / 60)
+        self.sec = int(self.timer % 60)
+        self.create_enemy()
+#-----------------------------------------------------------------------------------------------------------
+
+
+#-----------------------------------------------------------------------------------------------------------
 class BackGround:
     def __init__(self):
         self.image1 = load_image('image\stage\stage1_01.png')
@@ -47,15 +76,19 @@ class BackGround:
         self.image1.clip_draw(0, 0, self.width, self.height, self.x1, self.y1)
         self.image2.clip_draw(0, 0, self.width, self.height, self.x2, self.y2)
         self.image3.clip_draw(0, 0, self.width, self.height, self.x3, self.y3)
+#-----------------------------------------------------------------------------------------------------------
 
 
 def create_object():
-    global background, player
-    global PLAYER_BULLETS
+    global my_timer,background, player
+    global PLAYER_BULLETS, ENEMiES
 
+    my_timer = Timer()
     background = BackGround()
     player = Player()
+
     PLAYER_BULLETS = []
+    ENEMiES = []
 
 
 def enter():
@@ -64,22 +97,24 @@ def enter():
 
 
 def exit():
-    global background, player
-    global PLAYER_BULLETS
+    global background, player, my_timer
+    global PLAYER_BULLETS, ENEMiES
+
+    del my_timer
     del background
     del player
 
     del PLAYER_BULLETS
+    del ENEMiES
 
 
 def update(frame_time):
-    global player_bullet, isBullet_On, bulletTime
+    global my_timer, player_bullet, isBullet_On, bulletTime
     bulletTime += frame_time * 10
     if isBullet_On and bulletTime > 0.5:
         player_bullet = Bullet(*player.get_pos())
         PLAYER_BULLETS.append(player_bullet)
         bulletTime = 0
-
 
     background.update(frame_time)
     player.update(frame_time)
@@ -89,6 +124,8 @@ def update(frame_time):
         if isDel == True :
             PLAYER_BULLETS.remove(p_bullet)
 
+    for enemise in ENEMiES :
+        enemise.update(frame_time)
 
 def draw_stage_scene():
     background.draw()
@@ -97,6 +134,8 @@ def draw_stage_scene():
     for p_bullet in PLAYER_BULLETS :
         p_bullet.draw()
 
+    for enemise in ENEMiES :
+        enemise.draw()
 
 def draw(frame_time):
     clear_canvas()
@@ -126,7 +165,4 @@ def pause():
 
 def resume():
     pass
-
-
-# bullet
 
