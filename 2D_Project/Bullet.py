@@ -20,11 +20,11 @@ class Bullet:
         else :
             return False
 
-    def get_bb(self):
+    def get_size(self):
         return self.x - 15, self.y - 20, self.x + 15, self.y + 20
 
     def draw_bb(self):
-        draw_rectangle(*self.get_bb())
+        draw_rectangle(*self.get_size())
 
     def draw(self):
         self.image.draw(self.x, self.y)
@@ -46,8 +46,8 @@ class EnummyBullet(Bullet):
         else :
             return False
 
-    def get_bb(self):
+    def get_size(self):
         return self.x - 10, self.y - 10, self.x + 10, self.y + 10
 
     def draw_bb(self):
-        draw_rectangle(*self.get_bb())
+        draw_rectangle(*self.get_size())

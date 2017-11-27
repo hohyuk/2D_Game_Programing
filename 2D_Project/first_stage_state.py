@@ -29,6 +29,7 @@ isBullet_On = False
 bulletTime = 0
 e_bulletTime = 0
 
+
 #-----------------------------------------------------------------------------------------------------------
 class Timer:
     def __init__(self):
@@ -195,8 +196,8 @@ def handle_events(frame_time):
 
 
 def collision(a, b):
-    left_a, bottom_a, right_a, top_a = a.get_bb()
-    left_b, bottom_b, right_b, top_b = b.get_bb()
+    left_a, bottom_a, right_a, top_a = a.get_size()
+    left_b, bottom_b, right_b, top_b = b.get_size()
 
     if left_a > right_b : return False
     if right_a < left_b : return False

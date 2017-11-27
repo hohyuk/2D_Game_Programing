@@ -21,11 +21,11 @@ class Enemy:
         print(self.x,self.y)
         return self.x, self.y - 10
 
-    def get_bb(self):
+    def get_size(self):
         return self.x - 24, self.y - 24, self.x + 24, self.y + 24
 
     def draw_bb(self):
-        draw_rectangle(*self.get_bb())
+        draw_rectangle(*self.get_size ())
 
     def update(self, frame_time):
         self.y -= 0.5
