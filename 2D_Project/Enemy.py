@@ -18,13 +18,12 @@ class Enemy:
         Enemy.image = load_image('image/enemy/Enemy.png')
 
     def get_pos(self):
-        print(self.x,self.y)
         return self.x, self.y - 10
 
     def get_size(self):
         return self.x - 24, self.y - 24, self.x + 24, self.y + 24
 
-    def draw_bb(self):
+    def draw_box(self):
         draw_rectangle(*self.get_size ())
 
     def update(self, frame_time):

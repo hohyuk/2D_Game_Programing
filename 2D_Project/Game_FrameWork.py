@@ -92,6 +92,7 @@ def run(start_state):
         stack[-1].exit()
         stack.pop()
 
+
 def reset_time():
     global current_time
     current_time = time.clock()

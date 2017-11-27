@@ -3,7 +3,7 @@ import os
 from pico2d import *
 
 from Player import Player   # import Player class from Player.py
-from Bullet import Bullet, EnummyBullet
+from Missile import Missile, EnummyMissile
 from Enemy import Enemy
 
 import Game_FrameWork
@@ -16,14 +16,14 @@ name = "FirstStageState"
 my_timer = None
 background = None
 player = None
-player_bullet = None
+player_missile = None
 enemy = None
-enemy_bullet = None
+enemy_missile = None
 
 # List
-PLAYER_BULLETS = None
+PLAYER_MISSILES = None
 ENEMiES = None
-ENEMY_BULLETS = None
+ENEMY_MISSILES = None
 
 isBullet_On = False
 bulletTime = 0
@@ -85,15 +85,15 @@ class BackGround:
 
 def create_object():
     global my_timer,background, player
-    global PLAYER_BULLETS, ENEMiES, ENEMY_BULLETS
+    global PLAYER_MISSILES, ENEMiES, ENEMY_MISSILES
 
     my_timer = Timer()
     background = BackGround()
     player = Player()
 
-    PLAYER_BULLETS = []
+    PLAYER_MISSILES = []
     ENEMiES = []
-    ENEMY_BULLETS = []
+    ENEMY_MISSILES = []
 
 
 def enter():
@@ -103,27 +103,27 @@ def enter():
 
 def exit():
     global background, player, my_timer
-    global PLAYER_BULLETS, ENEMiES, ENEMY_BULLETS
+    global PLAYER_MISSILES, ENEMiES, ENEMY_MISSILES
 
     del my_timer
     del background
     del player
 
-    del PLAYER_BULLETS
+    del PLAYER_MISSILES
     del ENEMiES
-    del ENEMY_BULLETS
+    del ENEMY_MISSILES
 
 
 def update(frame_time):
-    global my_timer, player_bullet, isBullet_On, enemy_bullet
+    global my_timer, player_missile, isBullet_On, enemy_missile
     global bulletTime, e_bulletTime
 
     bulletTime += frame_time * 10
     e_bulletTime += frame_time * 10
 
     if isBullet_On and bulletTime > 2:
-        player_bullet = Bullet(*player.get_pos())
-        PLAYER_BULLETS.append(player_bullet)
+        player_missile = Missile(*player.get_pos())
+        PLAYER_MISSILES.append(player_missile)
         bulletTime = 0
 
     my_timer.update(frame_time)
@@ -131,46 +131,46 @@ def update(frame_time):
     player.update(frame_time)
 
 
-    for p_bullet in PLAYER_BULLETS :
+    for p_bullet in PLAYER_MISSILES :
         isDel = p_bullet.update(frame_time)
         if isDel == True :
-            PLAYER_BULLETS.remove(p_bullet)
+            PLAYER_MISSILES.remove(p_bullet)
 
     for enemise in ENEMiES :
         isDel = enemise.update(frame_time)
         if e_bulletTime > 4:
-            enemy_bullet = EnummyBullet(*enemise.get_pos())
-            ENEMY_BULLETS.append(enemy_bullet)
+            enemy_missile = EnummyMissile(*enemise.get_pos())
+            ENEMY_MISSILES.append(enemy_missile)
             e_bulletTime = 0
         if isDel == True:
             ENEMiES.remove(enemise)
 
-    for e_bullet in ENEMY_BULLETS :
+    for e_bullet in ENEMY_MISSILES :
         isDel = e_bullet.update(frame_time)
         if isDel == True :
-            ENEMY_BULLETS.remove(e_bullet)
+            ENEMY_MISSILES.remove(e_bullet)
 
     # collision
-    for p_bullet in PLAYER_BULLETS :
+    for p_bullet in PLAYER_MISSILES :
         for enemise in ENEMiES :
             if collision(p_bullet,enemise) :
-                PLAYER_BULLETS.remove(p_bullet)
+                PLAYER_MISSILES.remove(p_bullet)
                 ENEMiES.remove(enemise)
 def draw_stage_scene():
     background.draw()
     player.draw()
-    player.draw_bb()
-    for p_bullet in PLAYER_BULLETS :
+    player.draw_box()
+    for p_bullet in PLAYER_MISSILES :
         p_bullet.draw()
-        p_bullet.draw_bb()
+        p_bullet.draw_box()
 
     for enemise in ENEMiES :
         enemise.draw()
-        enemise.draw_bb()
+        enemise.draw_box()
 
-    for e_bullet in ENEMY_BULLETS :
+    for e_bullet in ENEMY_MISSILES :
         e_bullet.draw()
-        e_bullet.draw_bb()
+        e_bullet.draw_box()
 
 
 def draw(frame_time):
@@ -181,6 +181,7 @@ def draw(frame_time):
 
 def handle_events(frame_time):
     global player, isBullet_On
+
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
