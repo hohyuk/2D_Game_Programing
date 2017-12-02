@@ -13,7 +13,6 @@ import pause_state
 
 name = "FirstStageState"
 
-my_timer = None
 background = None
 player = None
 player_missile = None
@@ -61,7 +60,7 @@ class BackGround:
 
 
 def create_object():
-    global my_timer,background, player
+    global background, player
     global PLAYER_MISSILES, ENEMiES, ENEMY_MISSILES
 
     background = BackGround()
@@ -78,10 +77,9 @@ def enter():
 
 
 def exit():
-    global background, player, my_timer
+    global background, player
     global PLAYER_MISSILES, ENEMiES, ENEMY_MISSILES
 
-    del my_timer
     del background
     del player
 
@@ -91,7 +89,7 @@ def exit():
 
 
 def update(frame_time):
-    global my_timer, player_missile, isBullet_On, enemy_missile, enemyTime, enemy
+    global player_missile, isBullet_On, enemy_missile, enemyTime, enemy
     global bulletTime, e_bulletTime
 
     enemyTime += frame_time
@@ -108,7 +106,6 @@ def update(frame_time):
         PLAYER_MISSILES.append(player_missile)
         bulletTime = 0
 
-    #my_timer.update(frame_time)
     background.update(frame_time)
     player.update(frame_time)
 

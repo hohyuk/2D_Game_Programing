@@ -37,12 +37,8 @@ class Player:
         self.x += (self.xDir * distance)
         self.y += (self.yDir * distance)
 
-        def clamp(minPos, x, maxPos):
-            return max(minPos, min(x, maxPos))
-
         self.x = clamp(self.PLAYER_HALF_SIZE_X, self.x, Game_FrameWork.Width - self.PLAYER_HALF_SIZE_X)
         self.y = clamp(self.PLAYER_HALF_SIZE_Y, self.y, Game_FrameWork.Height - self.PLAYER_HALF_SIZE_Y)
-
 
     def handle_event(self, event):
         # 위
@@ -50,17 +46,17 @@ class Player:
             if self.state in (self.STAND, self.LEFT, self.RIGHT):
                 self.state = self.FORWARD
                 self.yDir = 1
-                print(1)
+
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_UP):
             if self.state in (self.FORWARD,):
                 self.state = self.STAND
                 self.frame = 0
                 self.yDir = 0
-                print(0)
+
         # 아래
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_DOWN):
             if self.state in (self.STAND, self.LEFT, self.RIGHT):
-                self.state = self.STAND
+                self.state = self.FORWARD
                 self.yDir = -1
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_DOWN):
             if self.state in (self.STAND,):
@@ -89,7 +85,7 @@ class Player:
                 self.state = self.RIGHT
                 self.xDir = 1
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_RIGHT):
-            if self.state in (self.RIGHT,self.FORWARD,):
+            if self.state in (self.RIGHT, self.FORWARD,):
                 self.state = self.STAND
                 self.frame = 0
                 self.xDir = 0
@@ -98,13 +94,14 @@ class Player:
     def draw(self):
         self.image.clip_draw(self.frame * Player.PLAYER_SIZE, self.state * Player.PLAYER_SIZE
                              , Player.PLAYER_SIZE, Player.PLAYER_SIZE, self.x, self.y)
+
     def get_pos(self):
         print(self.x,self.y)
         return self.x, self.y
 
     def get_size(self):
-        return self.x - self.PLAYER_HALF_SIZE_X, self.y - self.PLAYER_HALF_SIZE_Y, self.x + self.PLAYER_HALF_SIZE_X, self.y + self.PLAYER_HALF_SIZE_Y
+        return self.x - self.PLAYER_HALF_SIZE_X, self.y - self.PLAYER_HALF_SIZE_Y, self.x + self.PLAYER_HALF_SIZE_X, \
+               self.y + self.PLAYER_HALF_SIZE_Y
 
     def draw_box(self):
         draw_rectangle(*self.get_size())
-
