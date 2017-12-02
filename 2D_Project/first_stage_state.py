@@ -26,32 +26,9 @@ ENEMiES = None
 ENEMY_MISSILES = None
 
 isBullet_On = False
+enemyTime = 0
 bulletTime = 0
 e_bulletTime = 0
-
-
-#-----------------------------------------------------------------------------------------------------------
-class Timer:
-    def __init__(self):
-        self.time = 0.0
-        self.timer = 0.0
-        self.min = 0.0
-        self.sec = 0.0
-
-    def create_enemy(self):
-        global enemy
-        if self.time >= 2.0 :
-            enemy = Enemy()
-            ENEMiES.append(enemy)
-            self.time = 0.0
-
-    def update(self,frame_time):
-        self.timer += frame_time
-        self.time += frame_time
-        self.min = int(self.timer / 60)
-        self.sec = int(self.timer % 60)
-        self.create_enemy()
-#-----------------------------------------------------------------------------------------------------------
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -87,7 +64,6 @@ def create_object():
     global my_timer,background, player
     global PLAYER_MISSILES, ENEMiES, ENEMY_MISSILES
 
-    my_timer = Timer()
     background = BackGround()
     player = Player()
 
@@ -115,8 +91,14 @@ def exit():
 
 
 def update(frame_time):
-    global my_timer, player_missile, isBullet_On, enemy_missile
+    global my_timer, player_missile, isBullet_On, enemy_missile, enemyTime, enemy
     global bulletTime, e_bulletTime
+
+    enemyTime += frame_time
+    if enemyTime >= 2.0:
+        enemy = Enemy()
+        ENEMiES.append(enemy)
+        enemyTime = 0.0
 
     bulletTime += frame_time * 10
     e_bulletTime += frame_time * 10
@@ -126,10 +108,11 @@ def update(frame_time):
         PLAYER_MISSILES.append(player_missile)
         bulletTime = 0
 
-    my_timer.update(frame_time)
+    #my_timer.update(frame_time)
     background.update(frame_time)
     player.update(frame_time)
 
+    print(enemyTime)
 
     for p_bullet in PLAYER_MISSILES :
         isDel = p_bullet.update(frame_time)

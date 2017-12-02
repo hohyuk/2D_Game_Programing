@@ -5,8 +5,6 @@ from pico2d import *
 import Game_FrameWork
 
 
-
-
 class Enemy:
     Enemy_SIZE = 64
     ENEMY_BULLETS = []
