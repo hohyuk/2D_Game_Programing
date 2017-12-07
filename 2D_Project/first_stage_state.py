@@ -36,6 +36,11 @@ class BackGround:
         self.image1 = load_image('image\stage\stage1_01.png')
         self.image2 = load_image('image\stage\stage1_02.png')
         self.image3 = load_image('image\stage\stage1_03.png')
+        #Sound
+        self.bgm = load_music('sound/Stage1.mp3')
+        self.bgm.set_volume(64)
+        #self.bgm.repeat_play()
+
         self.width = Game_FrameWork.Width
         self.height = 6000
 
@@ -108,8 +113,6 @@ def update(frame_time):
 
     background.update(frame_time)
     player.update(frame_time)
-
-    print(enemyTime)
 
     for p_bullet in PLAYER_MISSILES :
         isDel = p_bullet.update(frame_time)

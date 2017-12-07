@@ -15,7 +15,7 @@ class Player:
     FLY_SPEED_MPS = (FLY_SPEED_MPM / 60.0)
     FLY_SPEED_PPS = (FLY_SPEED_MPS * PIXEL_PER_METER)
 
-    STAND, FORWARD, RIGHT, LEFT = 0, 1, 2, 3
+    STAND, BACK, FORWARD, LEFT, RIGHT = 0, 1, 2, 3, 4
 
     image = None
 
@@ -29,7 +29,9 @@ class Player:
 
     def update(self, frame_time):
         distance = Player.FLY_SPEED_PPS * frame_time
-        if self.state in (self.STAND, self.FORWARD):
+        if self.state in (self.STAND,):
+            self.frame = (self.frame + 1) % 3
+        if self.state in (self.FORWARD, self.BACK):
             self.frame = (self.frame + 1) % 3
         elif self.state in (self.LEFT, self.RIGHT):
             self.frame = 2
@@ -55,20 +57,17 @@ class Player:
 
         # 아래
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_DOWN):
-            if self.state in (self.STAND, self.LEFT, self.RIGHT):
-                self.state = self.FORWARD
+            if self.state in (self.STAND, self.FORWARD, self.LEFT, self.RIGHT):
+                self.state = self.BACK
                 self.yDir = -1
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_DOWN):
-            if self.state in (self.STAND,):
+            if self.state in (self.BACK,):
                 self.state = self.STAND
                 self.frame = 0
-                self.xDir = 0
                 self.yDir = 0
         # 왼쪽
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_LEFT):
-            if self.state in (self.FORWARD,):
-                self.xDir = -1
-            elif self.state in (self.STAND, self.RIGHT):
+            if self.state in (self.FORWARD, self.BACK, self.STAND, self.RIGHT):
                 self.state = self.LEFT
                 self.xDir = -1
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_LEFT):
@@ -76,12 +75,10 @@ class Player:
                 self.state = self.STAND
                 self.frame = 0
                 self.xDir = 0
-                self.yDir = 0
+
         # 오른쪽
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_RIGHT):
-            if self.state in (self.FORWARD,):
-                self.xDir = 1
-            elif self.state in (self.STAND, self.LEFT):
+            if self.state in (self.FORWARD, self.BACK, self.STAND, self.LEFT):
                 self.state = self.RIGHT
                 self.xDir = 1
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_RIGHT):

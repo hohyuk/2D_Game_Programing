@@ -22,7 +22,7 @@ class Missile:
     def update(self, frame_time):
         bullet_distance = Missile.MISSILE_SPEED_PPS * frame_time
         self.y += bullet_distance
-        if self.y > 500 :
+        if self.y > 600 :
             return True
         else :
             return False
