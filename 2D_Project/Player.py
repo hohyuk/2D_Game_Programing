@@ -2,11 +2,13 @@ import random
 
 from pico2d import *
 
+from HP_UI import *
 import Game_FrameWork
 
 
 class Player:
     PLAYER_SIZE = 64
+    PLAYER_EXPLOSION_SIZE =128
     PLAYER_HALF_SIZE_X = 25
     PLAYER_HALF_SIZE_Y = 30
     PIXEL_PER_METER = (10.0 / 22.25)          # 10 pixel 22.25m -> 22.25cm -> 73fit
@@ -24,14 +26,14 @@ class Player:
         self.state = self.STAND
         self.x, self.y = 400, 90
         self.xDir, self. yDir = 0, 0
-
+        self.HP = 180
+        self.HpBar = PlayerHpBar()
+        self.HpGauge = PlayerHpGauge()
         Player.image = load_image('image/player/player.png')
 
     def update(self, frame_time):
         distance = Player.FLY_SPEED_PPS * frame_time
-        if self.state in (self.STAND,):
-            self.frame = (self.frame + 1) % 3
-        if self.state in (self.FORWARD, self.BACK):
+        if self.state in (self.STAND,self.FORWARD, self.BACK):
             self.frame = (self.frame + 1) % 3
         elif self.state in (self.LEFT, self.RIGHT):
             self.frame = 2
@@ -91,9 +93,10 @@ class Player:
     def draw(self):
         self.image.clip_draw(self.frame * Player.PLAYER_SIZE, self.state * Player.PLAYER_SIZE
                              , Player.PLAYER_SIZE, Player.PLAYER_SIZE, self.x, self.y)
+        self.HpBar.draw()
+        self.HpGauge.draw(self.HP)
 
     def get_pos(self):
-        print(self.x,self.y)
         return self.x, self.y
 
     def get_size(self):
@@ -102,3 +105,6 @@ class Player:
 
     def draw_box(self):
         draw_rectangle(*self.get_size())
+
+    def get_HP(self):
+        return self.HP

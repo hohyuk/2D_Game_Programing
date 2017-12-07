@@ -40,7 +40,6 @@ class Missile:
 class EnummyMissile(Missile):
     MISSILE_HALF_SIZE_X = 10
     MISSILE_HALF_SIZE_Y = 10
-    image = None
 
     def __init__(self, x, y):
         self.x, self.y = x, y
@@ -50,7 +49,7 @@ class EnummyMissile(Missile):
     def update(self, frame_time):
         enemy_missile_distance = Missile.MISSILE_SPEED_PPS * frame_time
         self.y -= enemy_missile_distance
-        if self.y < 50 :
+        if self.y < 0 :
             return True
         else :
             return False

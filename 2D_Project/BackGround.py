@@ -1,0 +1,35 @@
+from pico2d import *
+
+import Game_FrameWork
+
+
+class BackGround:
+    def __init__(self):
+        self.image1 = load_image('image/stage/stage1_01.png')
+        self.image2 = load_image('image/stage/stage1_02.png')
+        self.image3 = load_image('image/stage/stage1_03.png')
+        #Sound
+        self.bgm = load_music('sound/Stage1.mp3')
+        self.bgm.set_volume(64)
+        #self.bgm.repeat_play()
+
+        self.width = Game_FrameWork.Width
+        self.height = 6000
+
+        self.x1, self.y1 = self.width / 2, self.height / 2           # 화면 초기값. stage1_01 초기값.
+        self.x2, self.y2 = self.width / 2, self.height / 2 + 600     # stage1_02화면 초기값.
+        self.x3, self.y3 = self.width / 2, self.height / 2 + 600     # stage1_02화면 초기값.
+        self.move = 0.2
+
+    def update(self, frame_time):
+        if self.y1 > -(self.height / 2):
+            self.y1 -= self.move
+        if self.y1 < -(self.height / 2)+600:
+            self.y2 -= self.move
+        if (self.y2 < -(self.height / 2) + 600) and (self.y3 > -(self.height / 2) + 600):
+            self.y3 -= self.move
+
+    def draw(self):
+        self.image1.clip_draw(0, 0, self.width, self.height, self.x1, self.y1)
+        self.image2.clip_draw(0, 0, self.width, self.height, self.x2, self.y2)
+        self.image3.clip_draw(0, 0, self.width, self.height, self.x3, self.y3)
