@@ -41,10 +41,11 @@ class EnummyMissile(Missile):
     MISSILE_HALF_SIZE_X = 10
     MISSILE_HALF_SIZE_Y = 10
 
+
     def __init__(self, x, y):
         self.x, self.y = x, y
-
         EnummyMissile.image = load_image('image/missile/Missile_Enemy01.png')
+        EnummyMissile.time = 0
 
     def update(self, frame_time):
         enemy_missile_distance = Missile.MISSILE_SPEED_PPS * frame_time

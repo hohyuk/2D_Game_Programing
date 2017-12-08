@@ -18,7 +18,7 @@ class PlayerExplosion(Explosion):
     def update(self,frame_time):
         self.frame = (self.frame + 1) % 6
 
-        if self.frame == 11:
+        if self.frame == 5:
             return True
         else:
             return False

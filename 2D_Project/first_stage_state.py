@@ -25,7 +25,7 @@ ENEMY_MISSILES = None
 ExplosionList = None
 
 isBullet_On = False
-enemyTime = 0
+enemyCreateTime = 0
 bulletTime = 0
 e_bulletTime = 0
 
@@ -61,14 +61,11 @@ def exit():
     del ExplosionList
 
 def update(frame_time):
-    global player_missile, isBullet_On, enemy_missile, enemyTime, enemy, explosion
+    global player_missile, isBullet_On, enemy_missile, enemy, explosion
     global bulletTime, e_bulletTime
 
-    enemyTime += frame_time
-    if enemyTime >= 2.0:
-        enemy = Enemy()
-        ENEMiES.append(enemy)
-        enemyTime = 0.0
+    createEnemy(frame_time)
+
 
     bulletTime += frame_time * 10
     e_bulletTime += frame_time * 10
@@ -81,10 +78,10 @@ def update(frame_time):
     background.update(frame_time)
     player.update(frame_time)
 
-    for p_bullet in PLAYER_MISSILES :
-        isDel = p_bullet.update(frame_time)
+    for object in PLAYER_MISSILES :
+        isDel = object.update(frame_time)
         if isDel == True :
-            PLAYER_MISSILES.remove(p_bullet)
+            PLAYER_MISSILES.remove(object)
 
     for enemise in ENEMiES :
         isDel = enemise.update(frame_time)
@@ -101,18 +98,25 @@ def update(frame_time):
             ENEMY_MISSILES.remove(e_bullet)
 
     # collision
-    for p_bullet in PLAYER_MISSILES :
+    for object in PLAYER_MISSILES :
         for enemise in ENEMiES :
-            if collision(p_bullet,enemise) :
-                PLAYER_MISSILES.remove(p_bullet)
+            if collision(object,enemise) :
+                PLAYER_MISSILES.remove(object)
                 explosion = EnemyExplosion(enemise.x,enemise.y)
                 ExplosionList.append(explosion)
                 ENEMiES.remove(enemise)
+
+    for missileIter in ENEMY_MISSILES:
+        if collision(missileIter,player) :
+            ENEMY_MISSILES.remove(missileIter)
+            player.set_damage(10)
+
 
     for explosions in ExplosionList :
         isDel = explosions.update(frame_time)
         if isDel == True:
             ExplosionList.remove(explosions)
+
 
 def draw_stage_scene():
     background.draw()
@@ -155,6 +159,15 @@ def handle_events(frame_time):
             isBullet_On = False
         else:
             player.handle_event(event)
+
+
+def createEnemy(frame_time):
+    global enemyCreateTime
+    enemyCreateTime += frame_time
+    if enemyCreateTime >= 2.0:
+        enemy = Enemy()
+        ENEMiES.append(enemy)
+        enemyCreateTime = 0.0
 
 
 def collision(a, b):

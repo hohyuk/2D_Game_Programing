@@ -20,7 +20,7 @@ class Player:
     STAND, BACK, FORWARD, LEFT, RIGHT = 0, 1, 2, 3, 4
 
     image = None
-
+    missileSound = None
     def __init__(self):
         self.frame = 0
         self.state = self.STAND
@@ -30,7 +30,9 @@ class Player:
         self.HpBar = PlayerHpBar()
         self.HpGauge = PlayerHpGauge()
         Player.image = load_image('image/player/player.png')
-
+        if Player.missileSound == None:
+            Player.missileSound = load_wav('sound/Missile.wav')
+            Player.missileSound.set_volume(64)
     def update(self, frame_time):
         distance = Player.FLY_SPEED_PPS * frame_time
         if self.state in (self.STAND,self.FORWARD, self.BACK):
@@ -97,7 +99,11 @@ class Player:
         self.HpGauge.draw(self.HP)
 
     def get_pos(self):
+        self.missileSound.play()
         return self.x, self.y
+
+    def set_damage(self,damage):
+        self.HP -= damage
 
     def get_size(self):
         return self.x - self.PLAYER_HALF_SIZE_X, self.y - self.PLAYER_HALF_SIZE_Y, self.x + self.PLAYER_HALF_SIZE_X, \
