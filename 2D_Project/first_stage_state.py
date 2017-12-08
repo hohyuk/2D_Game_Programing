@@ -15,6 +15,7 @@ name = "FirstStageState"
 background = None
 player = None
 player_missile = None
+player_explosion = None
 enemy = None
 enemy_missile = None
 explosion = None
@@ -49,11 +50,12 @@ def enter():
 
 
 def exit():
-    global background, player
+    global background, player, player_explosion
     global PLAYER_MISSILES, ENEMiES, ENEMY_MISSILES, ExplosionList
 
     del background
     del player
+    del player_explosion
 
     del PLAYER_MISSILES
     del ENEMiES
@@ -61,22 +63,22 @@ def exit():
     del ExplosionList
 
 def update(frame_time):
-    global player_missile, isBullet_On, enemy_missile, enemy, explosion
+    global player_missile, isBullet_On, enemy_missile, enemy, explosion, player_explosion
     global bulletTime, e_bulletTime
 
     createEnemy(frame_time)
 
-
     bulletTime += frame_time * 10
     e_bulletTime += frame_time * 10
 
-    if isBullet_On and bulletTime > 2:
-        player_missile = Missile(*player.get_pos())
-        PLAYER_MISSILES.append(player_missile)
-        bulletTime = 0
+    player.update(frame_time)
+    if player.get_HP() > 0:
+        if isBullet_On and bulletTime > 2:
+            player_missile = Missile(*player.get_pos())
+            PLAYER_MISSILES.append(player_missile)
+            bulletTime = 0
 
     background.update(frame_time)
-    player.update(frame_time)
 
     for object in PLAYER_MISSILES :
         isDel = object.update(frame_time)
@@ -109,8 +111,8 @@ def update(frame_time):
     for missileIter in ENEMY_MISSILES:
         if collision(missileIter,player) :
             ENEMY_MISSILES.remove(missileIter)
-            player.set_damage(10)
-
+            if player.get_HP() > 0 :
+                player.set_damage(10)
 
     for explosions in ExplosionList :
         isDel = explosions.update(frame_time)
@@ -132,8 +134,11 @@ def draw_stage_scene():
     for explosions in ExplosionList :
         explosions.draw()
 
+
     player.draw()
     player.draw_box()
+
+
     for p_bullet in PLAYER_MISSILES:
         p_bullet.draw()
         p_bullet.draw_box()

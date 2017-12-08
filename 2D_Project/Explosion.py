@@ -9,19 +9,19 @@ class Explosion:
 
 class PlayerExplosion(Explosion):
     SIZE = 128
+
     def __init__(self, x, y):
         self.x, self.y = x, y
         self.frame = 0
         self.time = 0
-        EnemyExplosion.image = load_image('image/explosion/explosion1.png')
+        PlayerExplosion.image = load_image('image/explosion/explosion1.png')
 
     def update(self,frame_time):
-        self.frame = (self.frame + 1) % 6
-
-        if self.frame == 5:
-            return True
-        else:
-            return False
+        self.time += frame_time * 10
+        if self.frame < 6 :
+            if self.time > 1:
+                self.frame = (self.frame + 1) % 7
+                self.time = 0
 
     def draw(self):
         self.image.clip_draw(self.frame * PlayerExplosion.SIZE, 0
