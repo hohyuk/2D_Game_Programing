@@ -5,7 +5,7 @@ from pico2d import *
 from BackGround import *
 from Player import Player   # import Player class from Player.py
 from Missile import *
-from Enemy import Enemy
+from Enemy import *
 from Explosion import *
 import Game_FrameWork
 import pause_state
@@ -22,18 +22,19 @@ explosion = None
 # List
 PLAYER_MISSILES = None
 ENEMiES = None
+MiddleEnemyList = None
 ENEMY_MISSILES = None
 ExplosionList = None
 
 isBullet_On = False
 enemyCreateTime = 0
-bulletTime = 0
-e_bulletTime = 0
+midEnemyCreateTime = 0
+missileCreateTime = 0
 
 
 def create_object():
     global background, player
-    global PLAYER_MISSILES, ENEMiES, ENEMY_MISSILES, ExplosionList
+    global PLAYER_MISSILES, ENEMiES, ENEMY_MISSILES, ExplosionList, MiddleEnemyList
 
     background = BackGround()
     player = Player()
@@ -42,7 +43,7 @@ def create_object():
     ENEMiES = []
     ENEMY_MISSILES = []
     ExplosionList = []
-
+    MiddleEnemyList = []
 
 def enter():
     Game_FrameWork.reset_time()
@@ -62,42 +63,25 @@ def exit():
     del ENEMY_MISSILES
     del ExplosionList
 
+
 def update(frame_time):
-    global player_missile, isBullet_On, enemy_missile, enemy, explosion, player_explosion
-    global bulletTime, e_bulletTime
+    global player_missile, isBullet_On, enemy_missile, enemy, explosion
+    global missileCreateTime
 
     createEnemy(frame_time)
 
-    bulletTime += frame_time * 10
-    e_bulletTime += frame_time * 10
+    missileCreateTime += frame_time * 10
 
     player.update(frame_time)
     if player.get_HP() > 0:
-        if isBullet_On and bulletTime > 2:
+        if isBullet_On and missileCreateTime > 2:
             player_missile = Missile(*player.get_pos())
             PLAYER_MISSILES.append(player_missile)
-            bulletTime = 0
+            missileCreateTime = 0
 
     background.update(frame_time)
+    createObjects(frame_time)
 
-    for object in PLAYER_MISSILES :
-        isDel = object.update(frame_time)
-        if isDel == True :
-            PLAYER_MISSILES.remove(object)
-
-    for enemise in ENEMiES :
-        isDel = enemise.update(frame_time)
-        if e_bulletTime > 4:
-            enemy_missile = EnummyMissile(*enemise.get_pos())
-            ENEMY_MISSILES.append(enemy_missile)
-            e_bulletTime = 0
-        if isDel == True:
-            ENEMiES.remove(enemise)
-
-    for e_bullet in ENEMY_MISSILES :
-        isDel = e_bullet.update(frame_time)
-        if isDel == True :
-            ENEMY_MISSILES.remove(e_bullet)
 
     # collision
     for object in PLAYER_MISSILES :
@@ -107,6 +91,12 @@ def update(frame_time):
                 explosion = EnemyExplosion(enemise.x,enemise.y)
                 ExplosionList.append(explosion)
                 ENEMiES.remove(enemise)
+        for enemise in MiddleEnemyList :
+            if collision(object,enemise) :
+                PLAYER_MISSILES.remove(object)
+                explosion = EnemyExplosion(enemise.x,enemise.y)
+                ExplosionList.append(explosion)
+                MiddleEnemyList.remove(enemise)
 
     for missileIter in ENEMY_MISSILES:
         if collision(missileIter,player) :
@@ -127,13 +117,16 @@ def draw_stage_scene():
         enemise.draw()
         enemise.draw_box()
 
+    for enemise in MiddleEnemyList :
+        enemise.draw()
+        enemise.draw_box()
+
     for e_bullet in ENEMY_MISSILES :
         e_bullet.draw()
         e_bullet.draw_box()
 
     for explosions in ExplosionList :
         explosions.draw()
-
 
     player.draw()
     player.draw_box()
@@ -167,13 +160,48 @@ def handle_events(frame_time):
 
 
 def createEnemy(frame_time):
-    global enemyCreateTime
+    global enemyCreateTime, midEnemyCreateTime
     enemyCreateTime += frame_time
+    midEnemyCreateTime += frame_time
     if enemyCreateTime >= 2.0:
         enemy = Enemy()
         ENEMiES.append(enemy)
         enemyCreateTime = 0.0
 
+    if midEnemyCreateTime >= 2.0:
+        midEnemy = MiddleEnemy()
+        MiddleEnemyList.append(midEnemy)
+        midEnemyCreateTime = 0
+
+
+def createObjects(frame_time):
+    for object in PLAYER_MISSILES :
+        isDel = object.update(frame_time)
+        if isDel == True :
+            PLAYER_MISSILES.remove(object)
+
+    for object in ENEMiES :
+        isDel = object.update(frame_time)
+        if object.getMissileTime() > 8:
+            enemy_missile = EnummyMissile(*object.get_pos())
+            ENEMY_MISSILES.append(enemy_missile)
+            object.setMissileTime(0)
+        if isDel == True:
+            ENEMiES.remove(object)
+
+    for object in MiddleEnemyList :
+        isDel = object.update(frame_time)
+        if object.getMissileTime() > 5:
+            enemy_missile = EnummyMissile(*object.get_pos())
+            ENEMY_MISSILES.append(enemy_missile)
+            object.setMissileTime(0)
+        if isDel == True:
+            MiddleEnemyList.remove(object)
+
+    for object in ENEMY_MISSILES :
+        isDel = object.update(frame_time)
+        if isDel == True :
+            ENEMY_MISSILES.remove(object)
 
 def collision(a, b):
     left_a, bottom_a, right_a, top_a = a.get_size()

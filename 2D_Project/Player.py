@@ -28,7 +28,7 @@ class Player:
         self.state = self.STAND
         self.x, self.y = 400, 90
         self.xDir, self. yDir = 0, 0
-        self.HP = 100
+        self.HP = 180
         self.HpBar = PlayerHpBar()
         self.HpGauge = PlayerHpGauge()
         self.Explosion = None
@@ -70,6 +70,7 @@ class Player:
             if self.state in (self.FORWARD,):
                 self.state = self.STAND
                 self.frame = 0
+                self.xDir = 0
                 self.yDir = 0
 
         # 아래
@@ -81,6 +82,7 @@ class Player:
             if self.state in (self.BACK,):
                 self.state = self.STAND
                 self.frame = 0
+                self.xDir = 0
                 self.yDir = 0
         # 왼쪽
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_LEFT):
@@ -92,6 +94,7 @@ class Player:
                 self.state = self.STAND
                 self.frame = 0
                 self.xDir = 0
+                self.yDir = 0
 
         # 오른쪽
         if (event.type, event.key) == (SDL_KEYDOWN, SDLK_RIGHT):
@@ -99,7 +102,7 @@ class Player:
                 self.state = self.RIGHT
                 self.xDir = 1
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_RIGHT):
-            if self.state in (self.RIGHT, self.FORWARD,):
+            if self.state in (self.RIGHT,):
                 self.state = self.STAND
                 self.frame = 0
                 self.xDir = 0
