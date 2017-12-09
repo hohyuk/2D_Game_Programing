@@ -11,6 +11,10 @@ button = None
 class Logo:
     def __init__(self):
         self.image = load_image('image\logo\logo.png')
+        # Sound
+        self.bgm = load_music('sound/Loading.mp3')
+        self.bgm.set_volume(64)
+        self.bgm.repeat_play()
 
     def draw(self):
         self.image.draw(400, 300)

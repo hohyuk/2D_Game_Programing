@@ -11,7 +11,7 @@ class BackGround:
         #Sound
         self.bgm = load_music('sound/Stage1.mp3')
         self.bgm.set_volume(64)
-        #self.bgm.repeat_play()
+        self.bgm.repeat_play()
 
         self.width = Game_FrameWork.Width
         self.height = 6000

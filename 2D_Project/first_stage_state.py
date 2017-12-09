@@ -8,6 +8,7 @@ from Missile import *
 from Enemy import *
 from Explosion import *
 import Game_FrameWork
+import logo_state
 import pause_state
 
 name = "FirstStageState"
@@ -91,6 +92,7 @@ def update(frame_time):
                 explosion = EnemyExplosion(enemise.x,enemise.y)
                 ExplosionList.append(explosion)
                 ENEMiES.remove(enemise)
+    for object in PLAYER_MISSILES:
         for enemise in MiddleEnemyList :
             if collision(object,enemise) :
                 PLAYER_MISSILES.remove(object)
@@ -155,6 +157,9 @@ def handle_events(frame_time):
             isBullet_On = True
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_SPACE):
             isBullet_On = False
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_RETURN):
+            if player.get_HP() <=0 :
+                Game_FrameWork.change_state(logo_state)
         else:
             player.handle_event(event)
 
