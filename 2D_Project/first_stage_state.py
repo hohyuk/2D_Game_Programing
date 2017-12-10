@@ -7,16 +7,19 @@ from Player import Player   # import Player class from Player.py
 from Missile import *
 from Enemy import *
 from Explosion import *
+from Score import *
 import Game_FrameWork
 import logo_state
 import pause_state
 
 name = "FirstStageState"
 
+StageTime = 0        # 게임 시작
+score = None
 background = None
 player = None
 player_missile = None
-player_explosion = None
+
 enemy = None
 enemy_missile = None
 explosion = None
@@ -34,10 +37,11 @@ missileCreateTime = 0
 
 
 def create_object():
-    global background, player
+    global background, player, score
     global PLAYER_MISSILES, ENEMiES, ENEMY_MISSILES, ExplosionList, MiddleEnemyList
 
     background = BackGround()
+    score = Score()
     player = Player()
 
     PLAYER_MISSILES = []
@@ -52,22 +56,26 @@ def enter():
 
 
 def exit():
-    global background, player, player_explosion
+    global StageTime, background, score, player
     global PLAYER_MISSILES, ENEMiES, ENEMY_MISSILES, ExplosionList
 
     del background
+    del score
     del player
-    del player_explosion
 
     del PLAYER_MISSILES
     del ENEMiES
     del ENEMY_MISSILES
     del ExplosionList
 
+    StageTime = 0
 
 def update(frame_time):
+    global StageTime
     global player_missile, isBullet_On, enemy_missile, enemy, explosion
     global missileCreateTime
+
+    StageTime += frame_time
 
     createEnemy(frame_time)
 
@@ -75,6 +83,7 @@ def update(frame_time):
 
     player.update(frame_time)
     if player.get_HP() > 0:
+        score.setTime(StageTime)
         if isBullet_On and missileCreateTime > 2:
             player_missile = Missile(*player.get_pos())
             PLAYER_MISSILES.append(player_missile)
@@ -82,7 +91,6 @@ def update(frame_time):
 
     background.update(frame_time)
     createObjects(frame_time)
-
 
     # collision
     for object in PLAYER_MISSILES :
@@ -92,6 +100,7 @@ def update(frame_time):
                 explosion = EnemyExplosion(enemise.x,enemise.y)
                 ExplosionList.append(explosion)
                 ENEMiES.remove(enemise)
+                score.setScore(5)
     for object in PLAYER_MISSILES:
         for enemise in MiddleEnemyList :
             if collision(object,enemise) :
@@ -99,6 +108,7 @@ def update(frame_time):
                 explosion = EnemyExplosion(enemise.x,enemise.y)
                 ExplosionList.append(explosion)
                 MiddleEnemyList.remove(enemise)
+                score.setScore(10)
 
     for missileIter in ENEMY_MISSILES:
         if collision(missileIter,player) :
@@ -141,6 +151,7 @@ def draw_stage_scene():
 def draw(frame_time):
     clear_canvas()
     draw_stage_scene()
+    score.draw()
     update_canvas()
 
 
@@ -165,18 +176,37 @@ def handle_events(frame_time):
 
 
 def createEnemy(frame_time):
+    global StageTime
     global enemyCreateTime, midEnemyCreateTime
+
     enemyCreateTime += frame_time
     midEnemyCreateTime += frame_time
-    if enemyCreateTime >= 2.0:
-        enemy = Enemy()
-        ENEMiES.append(enemy)
-        enemyCreateTime = 0.0
 
-    if midEnemyCreateTime >= 2.0:
-        midEnemy = MiddleEnemy()
-        MiddleEnemyList.append(midEnemy)
-        midEnemyCreateTime = 0
+    if StageTime >10 :
+        if enemyCreateTime >= 2.0:
+            enemy1 = Enemy()
+            enemy2 = Enemy()
+            ENEMiES.append(enemy1)
+            ENEMiES.append(enemy2)
+            enemyCreateTime = 0.0
+    else:
+        if enemyCreateTime >= 2.0:
+            enemy = Enemy()
+            ENEMiES.append(enemy)
+            enemyCreateTime = 0.0
+    # 20초 후 중간 적이 나온다.
+    if StageTime > 25 :
+        if midEnemyCreateTime >= 2.0:
+            midEnemy1 = MiddleEnemy()
+            midEnemy2 = MiddleEnemy()
+            MiddleEnemyList.append(midEnemy1)
+            MiddleEnemyList.append(midEnemy2)
+            midEnemyCreateTime = 0
+    elif StageTime > 15 :
+        if midEnemyCreateTime >= 2.0:
+            midEnemy1 = MiddleEnemy()
+            MiddleEnemyList.append(midEnemy1)
+            midEnemyCreateTime = 0
 
 
 def createObjects(frame_time):
