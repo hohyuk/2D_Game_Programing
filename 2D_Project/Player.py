@@ -31,6 +31,8 @@ class Player:
         self.HP = 180
         self.HpBar = PlayerHpBar()
         self.HpGauge = PlayerHpGauge()
+        self.boomUI = BoomUI()
+        self.boomCount = 0 # 필살기 횟수
         self.Explosion = None
         self.isExplosion = False
         Player.image = load_image('image/player/player.png')
@@ -116,6 +118,7 @@ class Player:
             self.Explosion.draw()
         self.HpBar.draw()
         self.HpGauge.draw(self.HP)
+        self.boomUI.draw(self.boomCount)
 
     def get_pos(self):
         self.missileSound.play()
@@ -127,9 +130,14 @@ class Player:
     def set_damage(self,damage):
         self.HP -= damage
 
+    def set_bombItem(self,bomb):
+        self.boomCount += bomb;
     def get_size(self):
         return self.x - self.PLAYER_HALF_SIZE_X, self.y - self.PLAYER_HALF_SIZE_Y, self.x + self.PLAYER_HALF_SIZE_X, \
                self.y + self.PLAYER_HALF_SIZE_Y
 
     def draw_box(self):
         draw_rectangle(*self.get_size())
+
+    def revive(self):
+        self.__init__()

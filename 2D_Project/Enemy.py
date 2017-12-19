@@ -55,7 +55,7 @@ class Enemy:
 
 
 class MiddleEnemy(Enemy):
-    LEFT_DIR, RIGHT_DIR, GO_STRAIGHT = 0, 1, 2,
+    LEFT_DIR, RIGHT_DIR, GO_STRAIGHT = 0, 2, 1,
     SIZE = 44
     def __init__(self):
         self.x, self.y = random.randint(50, 750), 600
@@ -72,7 +72,7 @@ class MiddleEnemy(Enemy):
         if self.x < 0:
             self.state = self.RIGHT_DIR
             self.x = 0
-        if self.stateTime > 3:
+        if self.stateTime > 10:
             self.state = self.GO_STRAIGHT
             self.stateTime = 0
 
@@ -83,14 +83,14 @@ class MiddleEnemy(Enemy):
         if self.x > 800:
             self.state = self.LEFT_DIR
             self.x = 800
-        if self.stateTime > 3:
+        if self.stateTime > 10:
             self.state = self.GO_STRAIGHT
             self.stateTime = 0
 
     def handle_GoStraight(self):
         self.y -= self.distance
         self.state = self.GO_STRAIGHT
-        if self.stateTime > 3:
+        if self.stateTime > 10:
             self.state = random.randint(0, 2)
             self.stateTime = 0
 

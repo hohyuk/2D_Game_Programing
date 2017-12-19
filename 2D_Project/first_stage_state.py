@@ -8,6 +8,7 @@ from Missile import *
 from Enemy import *
 from Explosion import *
 from Score import *
+from Item import *
 import Game_FrameWork
 import logo_state
 import pause_state
@@ -20,8 +21,6 @@ background = None
 player = None
 player_missile = None
 
-enemy = None
-enemy_missile = None
 explosion = None
 # List
 PLAYER_MISSILES = None
@@ -35,9 +34,14 @@ enemyCreateTime = 0
 midEnemyCreateTime = 0
 missileCreateTime = 0
 
+# Item
+PowerItemList = None
+PowerItemTime = 0
+BombItemList = None
+BombItemTime = 0
 
-def create_object():
-    global background, player, score
+def init_object():
+    global background, player, score, PowerItemList, BombItemList
     global PLAYER_MISSILES, ENEMiES, ENEMY_MISSILES, ExplosionList, MiddleEnemyList
 
     background = BackGround()
@@ -50,9 +54,13 @@ def create_object():
     ExplosionList = []
     MiddleEnemyList = []
 
+    PowerItemList = []
+    BombItemList = []
+
+
 def enter():
     Game_FrameWork.reset_time()
-    create_object()
+    init_object()
 
 
 def exit():
@@ -73,16 +81,17 @@ def exit():
 def update(frame_time):
     global StageTime
     global player_missile, isBullet_On, enemy_missile, enemy, explosion
-    global missileCreateTime
+    global missileCreateTime, PowerItemList
 
-    StageTime += frame_time
-
+    # createUpdate---------------------------------
     createEnemy(frame_time)
-
+    createItem(frame_time)
+    # ---------------------------------------------
     missileCreateTime += frame_time * 10
 
     player.update(frame_time)
     if player.get_HP() > 0:
+        StageTime += frame_time
         score.setTime(StageTime)
         if isBullet_On and missileCreateTime > 2:
             player_missile = Missile(*player.get_pos())
@@ -90,7 +99,8 @@ def update(frame_time):
             missileCreateTime = 0
 
     background.update(frame_time)
-    createObjects(frame_time)
+    missileObjects(frame_time)
+    itemObjects(frame_time)
 
     # collision
     for object in PLAYER_MISSILES :
@@ -121,39 +131,15 @@ def update(frame_time):
         if isDel == True:
             ExplosionList.remove(explosions)
 
-
-def draw_stage_scene():
-    background.draw()
-
-    for enemise in ENEMiES :
-        enemise.draw()
-        enemise.draw_box()
-
-    for enemise in MiddleEnemyList :
-        enemise.draw()
-        enemise.draw_box()
-
-    for e_bullet in ENEMY_MISSILES :
-        e_bullet.draw()
-        e_bullet.draw_box()
-
-    for explosions in ExplosionList :
-        explosions.draw()
-
-    player.draw()
-    player.draw_box()
-
-
-    for p_bullet in PLAYER_MISSILES:
-        p_bullet.draw()
-        p_bullet.draw_box()
-
-def draw(frame_time):
-    clear_canvas()
-    draw_stage_scene()
-    score.draw()
-    update_canvas()
-
+    for poweritem in PowerItemList:
+        if collision(poweritem,player) :
+            PowerItemList.remove(poweritem)
+            if player.get_HP() > 0 :
+                player.set_damage(-10)
+    for bombitem in BombItemList:
+        if collision(bombitem,player) :
+            BombItemList.remove(bombitem)
+            player.set_bombItem(1)
 
 def handle_events(frame_time):
     global player, isBullet_On
@@ -171,6 +157,9 @@ def handle_events(frame_time):
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_RETURN):
             if player.get_HP() <=0 :
                 Game_FrameWork.change_state(logo_state)
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
+            if player.get_HP() <=0:
+                 player.revive()
         else:
             player.handle_event(event)
 
@@ -209,7 +198,23 @@ def createEnemy(frame_time):
             midEnemyCreateTime = 0
 
 
-def createObjects(frame_time):
+def createItem(frame_time):
+    global PowerItemTime, BombItemTime
+    PowerItemTime += frame_time
+    BombItemTime += frame_time
+
+    if PowerItemTime > 3 :
+        item = PowerItem()
+        PowerItemList.append(item)
+        PowerItemTime = 0
+
+    if BombItemTime > 3 :
+        item = BombItem()
+        BombItemList.append(item)
+        BombItemTime = 0
+
+
+def missileObjects(frame_time):
     for object in PLAYER_MISSILES :
         isDel = object.update(frame_time)
         if isDel == True :
@@ -238,6 +243,21 @@ def createObjects(frame_time):
         if isDel == True :
             ENEMY_MISSILES.remove(object)
 
+
+def itemObjects(frame_time):
+    for object in PowerItemList :
+        isDel = object.update(frame_time)
+
+        if isDel == True:
+            PowerItemList.remove(object)
+
+    for object in BombItemList:
+        isDel = object.update(frame_time)
+
+        if isDel == True:
+            BombItemList.remove(object)
+
+
 def collision(a, b):
     left_a, bottom_a, right_a, top_a = a.get_size()
     left_b, bottom_b, right_b, top_b = b.get_size()
@@ -248,6 +268,46 @@ def collision(a, b):
     if bottom_a > top_b : return False
 
     return True
+
+
+def draw_stage_scene():
+    background.draw()
+
+    for enemise in ENEMiES :
+        enemise.draw()
+        enemise.draw_box()
+
+    for enemise in MiddleEnemyList :
+        enemise.draw()
+        enemise.draw_box()
+
+    for e_bullet in ENEMY_MISSILES :
+        e_bullet.draw()
+        e_bullet.draw_box()
+
+    for explosions in ExplosionList :
+        explosions.draw()
+
+    for powerItem in PowerItemList :
+        powerItem.draw()
+
+    for bombItem in BombItemList :
+        bombItem.draw()
+
+    player.draw()
+    player.draw_box()
+
+
+    for p_bullet in PLAYER_MISSILES:
+        p_bullet.draw()
+        p_bullet.draw_box()
+
+
+def draw(frame_time):
+    clear_canvas()
+    draw_stage_scene()
+    score.draw()
+    update_canvas()
 
 
 def pause():
