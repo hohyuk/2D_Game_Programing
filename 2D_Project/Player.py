@@ -35,6 +35,7 @@ class Player:
         self.boomCount = 0 # 필살기 횟수
         self.Explosion = None
         self.isExplosion = False
+        self.upgrade_missile = True    # True = 기본 False = Special
         Player.image = load_image('image/player/player.png')
 
         if Player.missileSound == None:
@@ -109,6 +110,10 @@ class Player:
                 self.frame = 0
                 self.xDir = 0
                 self.yDir = 0
+        # 필살기
+        if (event.type, event.key) == (SDL_KEYDOWN, SDLK_z):
+            if self.boomCount>0:
+                self.boomCount -= 1
 
     def draw(self):
         if self.HP > 0:
@@ -127,11 +132,15 @@ class Player:
     def get_HP(self):
         return self.HP
 
-    def set_damage(self,damage):
+    def set_damage(self, damage):
         self.HP -= damage
 
-    def set_bombItem(self,bomb):
-        self.boomCount += bomb;
+    def change_Missile(self):
+        self.upgrade_missile = not self.upgrade_missile
+
+    def set_bombItem(self, bomb):
+        self.boomCount += bomb
+
     def get_size(self):
         return self.x - self.PLAYER_HALF_SIZE_X, self.y - self.PLAYER_HALF_SIZE_Y, self.x + self.PLAYER_HALF_SIZE_X, \
                self.y + self.PLAYER_HALF_SIZE_Y

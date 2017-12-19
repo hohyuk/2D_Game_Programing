@@ -5,6 +5,7 @@ import random
 
 class Item:
     LEFT_DIR, RIGHT_DIR = 0, 1
+    itemSound = None
 
     def handle_LeftDir(self):
         self.x -= 0.5
@@ -44,6 +45,9 @@ class PowerItem(Item):
         self.dir = random.randint(0, 1)
         self.dirTime = 0
         PowerItem.image = load_image('image/item/Item_Power.png')
+        if Item.itemSound == None:
+            Item.itemSound = load_wav('sound/Item.wav')
+            Item.itemSound.set_volume(64)
 
     def update(self,frame_time):
         self.time += frame_time * 10
@@ -83,6 +87,9 @@ class BombItem(Item):
         self.dir = random.randint(0, 1)
         self.dirTime = 0
         BombItem.image = load_image('image/item/Item_Bomb.png')
+        if Item.itemSound == None:
+            Item.itemSound = load_wav('sound/Item.wav')
+            Item.itemSound.set_volume(64)
 
     def update(self, frame_time):
         self.time += frame_time * 10

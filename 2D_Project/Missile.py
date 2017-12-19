@@ -37,6 +37,39 @@ class Missile:
         self.image.draw(self.x, self.y)
 
 
+class SpecialMissile(Missile):
+    SPECIAL_SIZEX = 40
+    SPECIAL_SIZEY = 48
+    STRAIGHT_MISSILE, LEFT_MISSILE, RIGHT_MISSILE = 0, 1, 2
+    specialSound = None
+
+    def __init__(self, x, y, dir):
+        self.x, self.y = x, y
+        self.dir = dir
+        Missile.image = load_image('image/missile/Special_Bullet.png')
+        if SpecialMissile.specialSound == None:
+            SpecialMissile.specialSound = load_wav('sound/Missile.wav')
+            SpecialMissile.specialSound.set_volume(64)
+
+    def update(self, frame_time):
+        bullet_distance = Missile.MISSILE_SPEED_PPS * frame_time
+
+        if self.dir == SpecialMissile.LEFT_MISSILE :
+            self.x-= bullet_distance
+        elif self.dir == SpecialMissile.RIGHT_MISSILE :
+            self.x += bullet_distance
+
+        self.y += bullet_distance
+        if self.y > 600 :
+            return True
+        else :
+            return False
+
+    def draw(self):
+        self.image.clip_draw(SpecialMissile.SPECIAL_SIZEX * self.dir, 0
+                                 , SpecialMissile.SPECIAL_SIZEX, SpecialMissile.SPECIAL_SIZEY, self.x, self.y)
+
+
 class EnummyMissile(Missile):
     MISSILE_HALF_SIZE_X = 10
     MISSILE_HALF_SIZE_Y = 10
