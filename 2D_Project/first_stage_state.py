@@ -12,7 +12,7 @@ from Item import *
 import Game_FrameWork
 import logo_state
 import pause_state
-
+import Game_Over_state
 name = "FirstStageState"
 
 StageTime = 0        # 게임 시작
@@ -42,7 +42,7 @@ BombItemList = None
 BombItemTime = 0
 
 def init_object():
-    global background, player, score, PowerItemList, BombItemList
+    global StageTime, background, player, score, PowerItemList, BombItemList
     global PLAYER_MISSILES
     global ENEMY_LIST, ENEMY_MISSILE_LIST, ExplosionList, MiddleEnemyList
 
@@ -60,6 +60,7 @@ def init_object():
     PowerItemList = []
     BombItemList = []
 
+    StageTime = 0
 
 def enter():
     Game_FrameWork.reset_time()
@@ -67,7 +68,7 @@ def enter():
 
 
 def exit():
-    global StageTime, background, score, player
+    global background, score, player
     global PLAYER_MISSILES
     global ENEMY_LIST, ENEMY_MISSILE_LIST, ExplosionList, MiddleEnemyList
 
@@ -82,7 +83,6 @@ def exit():
     del ExplosionList
     del MiddleEnemyList
 
-    StageTime = 0
 
 def update(frame_time):
     global StageTime
@@ -96,7 +96,7 @@ def update(frame_time):
     missileCreateTime += frame_time * 10
 
     player.update(frame_time)
-    if player.get_HP() > 0:
+    if player.HP > 0:
         StageTime += frame_time
         score.setTime(StageTime)
         if isBullet_On and missileCreateTime > 2:
@@ -113,7 +113,8 @@ def update(frame_time):
                 PLAYER_MISSILES.append(left_missile)
                 PLAYER_MISSILES.append(right_missile)
                 missileCreateTime = 0
-
+    else:
+        Game_FrameWork.push_state(Game_Over_state)
 
     background.update(frame_time)
     missileObjects(frame_time)
@@ -140,7 +141,7 @@ def update(frame_time):
     for missileIter in ENEMY_MISSILE_LIST:
         if collision(missileIter,player) :
             ENEMY_MISSILE_LIST.remove(missileIter)
-            if player.get_HP() > 0 :
+            if player.HP > 0 :
                 player.set_damage(10)
 
     for explosions in ExplosionList :
@@ -174,11 +175,13 @@ def handle_events(frame_time):
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_SPACE):
             isBullet_On = False
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_RETURN):
-            if player.get_HP() <=0 :
+            if player.HP <=0 :
                 Game_FrameWork.change_state(logo_state)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
-            if player.get_HP() <=0:
+            if player.HP <=0:
                  player.revive()
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_0):
+            player.set_damage(180)
         else:
             player.handle_event(event)
 

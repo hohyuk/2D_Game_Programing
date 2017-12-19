@@ -129,9 +129,6 @@ class Player:
         self.missileSound.play()
         return self.x, self.y
 
-    def get_HP(self):
-        return self.HP
-
     def set_damage(self, damage):
         self.HP -= damage
 
