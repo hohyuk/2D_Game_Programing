@@ -13,11 +13,16 @@ class Missile:
     MISSILE_SPEED_PPS = (MISSILE_SPEED_MPS * PIXEL_PER_METER)
 
     image = None
+    missileSound = None
 
     def __init__(self, x, y):
         self.x, self.y = x, y
 
         Missile.image = load_image('image/missile/Missile.png')
+
+        if Missile.missileSound == None:
+            Missile.missileSound = load_wav('sound/Missile.wav')
+            Missile.missileSound.set_volume(90)
 
     def update(self, frame_time):
         bullet_distance = Missile.MISSILE_SPEED_PPS * frame_time
@@ -90,6 +95,36 @@ class EnummyMissile(Missile):
 
     def get_size(self):
         return self.x - self.MISSILE_HALF_SIZE_X, self.y - self.MISSILE_HALF_SIZE_Y, self.x + self.MISSILE_HALF_SIZE_X, self.y + self.MISSILE_HALF_SIZE_Y
+
+    def draw_box(self):
+        draw_rectangle(*self.get_size())
+
+
+class MagicMissile(Missile):
+    MISSILE_SIZE = 38
+
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+        self.state = 0
+        MagicMissile.image = load_image('image/missile/Magic_Missile.png')
+        MagicMissile.time = 0
+
+    def update(self, frame_time):
+        self.state = (self.state + 1) % 3
+        enemy_missile_distance = Missile.MISSILE_SPEED_PPS * frame_time
+        self.y -= enemy_missile_distance
+        if self.y < 0 :
+            return True
+        else :
+            return False
+
+    def draw(self):
+        self.image.clip_draw(self.state * self.MISSILE_SIZE, 0
+                             , self.MISSILE_SIZE, self.MISSILE_SIZE, self.x, self.y)
+
+    def get_size(self):
+        return self.x - self.MISSILE_SIZE/2, self.y - self.MISSILE_SIZE/2, self.x + self.MISSILE_SIZE/2, \
+               self.y + self.MISSILE_SIZE/2
 
     def draw_box(self):
         draw_rectangle(*self.get_size())

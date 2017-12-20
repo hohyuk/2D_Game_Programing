@@ -20,19 +20,20 @@ score = None
 background = None
 player = None
 
-
-explosion = None
 # List
 PLAYER_MISSILES = None
 
-ENEMY_LIST = None
+LowEnemyList = None
 MiddleEnemyList = None
 ENEMY_MISSILE_LIST = None
 ExplosionList = None
+BigExplosionList = None
+HighEnemyList = None
 
 isBullet_On = False
 enemyCreateTime = 0
 midEnemyCreateTime = 0
+highEnemyCreateTime = 0
 missileCreateTime = 0
 
 # Item
@@ -44,7 +45,8 @@ BombItemTime = 0
 def init_object():
     global StageTime, background, player, score, PowerItemList, BombItemList
     global PLAYER_MISSILES
-    global ENEMY_LIST, ENEMY_MISSILE_LIST, ExplosionList, MiddleEnemyList
+    global LowEnemyList, ENEMY_MISSILE_LIST, MiddleEnemyList, HighEnemyList
+    global BigExplosionList, ExplosionList
 
     background = BackGround()
     score = Score()
@@ -52,10 +54,12 @@ def init_object():
 
     PLAYER_MISSILES = []
 
-    ENEMY_LIST = []
+    LowEnemyList = []
     ENEMY_MISSILE_LIST = []
     ExplosionList = []
+    BigExplosionList = []
     MiddleEnemyList = []
+    HighEnemyList = []
 
     PowerItemList = []
     BombItemList = []
@@ -70,7 +74,8 @@ def enter():
 def exit():
     global background, score, player
     global PLAYER_MISSILES
-    global ENEMY_LIST, ENEMY_MISSILE_LIST, ExplosionList, MiddleEnemyList
+    global LowEnemyList, ENEMY_MISSILE_LIST, MiddleEnemyList, HighEnemyList
+    global BigExplosionList, ExplosionList
 
     del background
     del score
@@ -78,15 +83,16 @@ def exit():
 
     del PLAYER_MISSILES
 
-    del ENEMY_LIST
+    del LowEnemyList
     del ENEMY_MISSILE_LIST
     del ExplosionList
+    del BigExplosionList
     del MiddleEnemyList
-
+    del HighEnemyList
 
 def update(frame_time):
     global StageTime
-    global isBullet_On, enemy_missile, enemy, explosion
+    global isBullet_On, enemy_missile, enemy
     global missileCreateTime, PowerItemList
 
     # createUpdate---------------------------------
@@ -102,6 +108,7 @@ def update(frame_time):
         if isBullet_On and missileCreateTime > 2:
             if player.upgrade_missile :
                 player_missile = Missile(*player.get_pos())
+                player_missile.missileSound.play()
                 PLAYER_MISSILES.append(player_missile)
                 missileCreateTime = 0
             else :
@@ -122,24 +129,52 @@ def update(frame_time):
 
     # collision
     for object in PLAYER_MISSILES :
-        for enemise in ENEMY_LIST :
-            if collision(object,enemise) :
+        for enemise in LowEnemyList :
+            if collision(object, enemise) :
                 PLAYER_MISSILES.remove(object)
                 explosion = EnemyExplosion(enemise.x,enemise.y)
                 ExplosionList.append(explosion)
-                ENEMY_LIST.remove(enemise)
+                LowEnemyList.remove(enemise)
                 score.setScore(5)
     for object in PLAYER_MISSILES:
         for enemise in MiddleEnemyList :
-            if collision(object,enemise) :
+            if collision(object, enemise) :
                 PLAYER_MISSILES.remove(object)
                 explosion = EnemyExplosion(enemise.x,enemise.y)
                 ExplosionList.append(explosion)
                 MiddleEnemyList.remove(enemise)
                 score.setScore(10)
 
+    for object in PLAYER_MISSILES:
+        for enemise in HighEnemyList :
+            if highEnemyCollision(object, enemise):
+                PLAYER_MISSILES.remove(object)
+                explosion = EnemyExplosion(object.x, object.y)
+                ExplosionList.append(explosion)
+                if enemise.HP >= 0 :
+                    enemise.set_damage(10)
+                else :
+                    score.setScore(30)
+                    explosion = BigExplosion(enemise.x, enemise.y)
+                    BigExplosionList.append(explosion)
+                    HighEnemyList.remove(enemise)
+
+    for object in PLAYER_MISSILES:
+        for enemise in HighEnemyList:
+            if collision(object, enemise):
+                PLAYER_MISSILES.remove(object)
+                explosion = EnemyExplosion(object.x, object.y)
+                ExplosionList.append(explosion)
+                if enemise.HP >= 0 :
+                    enemise.set_damage(10)
+                else :
+                    score.setScore(30)
+                    explosion = BigExplosion(enemise.x, enemise.y)
+                    BigExplosionList.append(explosion)
+                    HighEnemyList.remove(enemise)
+
     for missileIter in ENEMY_MISSILE_LIST:
-        if collision(missileIter,player) :
+        if collision(missileIter, player) :
             ENEMY_MISSILE_LIST.remove(missileIter)
             if player.HP > 0 :
                 player.set_damage(10)
@@ -148,6 +183,11 @@ def update(frame_time):
         isDel = explosions.update(frame_time)
         if isDel == True:
             ExplosionList.remove(explosions)
+
+    for explosions in BigExplosionList :
+        isDel = explosions.update(frame_time)
+        if isDel == True:
+            BigExplosionList.remove(explosions)
 
     for poweritem in PowerItemList:
         if collision(poweritem,player) :
@@ -161,49 +201,25 @@ def update(frame_time):
             BombItemList.remove(bombitem)
             player.set_bombItem(1)
 
-def handle_events(frame_time):
-    global player, isBullet_On
-
-    events = get_events()
-    for event in events:
-        if event.type == SDL_QUIT:
-            Game_FrameWork.quit()
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
-            Game_FrameWork.push_state(pause_state)
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
-            isBullet_On = True
-        elif (event.type, event.key) == (SDL_KEYUP, SDLK_SPACE):
-            isBullet_On = False
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_RETURN):
-            if player.HP <=0 :
-                Game_FrameWork.change_state(logo_state)
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
-            if player.HP <=0:
-                 player.revive()
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_0):
-            player.set_damage(180)
-        else:
-            player.handle_event(event)
-
 
 def createEnemy(frame_time):
     global StageTime
-    global enemyCreateTime, midEnemyCreateTime
+    global enemyCreateTime, midEnemyCreateTime, highEnemyCreateTime
 
     enemyCreateTime += frame_time
     midEnemyCreateTime += frame_time
-
+    highEnemyCreateTime += frame_time
     if StageTime >10 :
         if enemyCreateTime >= 2.0:
             enemy1 = Enemy()
             enemy2 = Enemy()
-            ENEMY_LIST.append(enemy1)
-            ENEMY_LIST.append(enemy2)
+            LowEnemyList.append(enemy1)
+            LowEnemyList.append(enemy2)
             enemyCreateTime = 0.0
     else:
         if enemyCreateTime >= 2.0:
             enemy = Enemy()
-            ENEMY_LIST.append(enemy)
+            LowEnemyList.append(enemy)
             enemyCreateTime = 0.0
     # 20초 후 중간 적이 나온다.
     if StageTime > 25 :
@@ -218,6 +234,13 @@ def createEnemy(frame_time):
             midEnemy1 = MiddleEnemy()
             MiddleEnemyList.append(midEnemy1)
             midEnemyCreateTime = 0
+
+    if StageTime > 2 :
+        if highEnemyCreateTime >= 5.0 :
+            highEnemy = HighEnemy()
+            HighEnemyList.append(highEnemy)
+            highEnemyCreateTime = 0
+
 
 
 def createItem(frame_time):
@@ -242,23 +265,34 @@ def missileObjects(frame_time):
         if isDel == True:
             PLAYER_MISSILES.remove(object)
 
-    for object in ENEMY_LIST :
+    for object in LowEnemyList :
         isDel = object.update(frame_time)
-        if object.getMissileTime() > 8:
+        if object.getMissileTime() > 1:
             enemy_missile = EnummyMissile(*object.get_pos())
             ENEMY_MISSILE_LIST.append(enemy_missile)
             object.setMissileTime(0)
         if isDel == True:
-            ENEMY_LIST.remove(object)
+            LowEnemyList.remove(object)
 
     for object in MiddleEnemyList :
         isDel = object.update(frame_time)
-        if object.getMissileTime() > 5:
+        if object.getMissileTime() > 0.5:
             enemy_missile = EnummyMissile(*object.get_pos())
             ENEMY_MISSILE_LIST.append(enemy_missile)
             object.setMissileTime(0)
         if isDel == True:
             MiddleEnemyList.remove(object)
+
+    for object in HighEnemyList :
+        isDel = object.update(frame_time)
+        if object.Time  > 2:
+            enemy_missile1 = MagicMissile(*object.get_left_pos())
+            enemy_missile2 = MagicMissile(*object.get_right_pos())
+            ENEMY_MISSILE_LIST.append(enemy_missile1)
+            ENEMY_MISSILE_LIST.append(enemy_missile2)
+            object.setMissileTime(0)
+        if isDel == True:
+            HighEnemyList.remove(object)
 
     for object in ENEMY_MISSILE_LIST :
         isDel = object.update(frame_time)
@@ -292,14 +326,30 @@ def collision(a, b):
     return True
 
 
+def highEnemyCollision(a, b):
+    left_a, bottom_a, right_a, top_a = a.get_size()
+    left_b, bottom_b, right_b, top_b = b.get_bodysize()
+
+    if left_a > right_b: return False
+    if right_a < left_b: return False
+    if top_a < bottom_b: return False
+    if bottom_a > top_b: return False
+
+    return True
+
+
 def draw_stage_scene():
     background.draw()
 
-    for enemise in ENEMY_LIST :
+    for enemise in LowEnemyList :
         enemise.draw()
         enemise.draw_box()
 
     for enemise in MiddleEnemyList :
+        enemise.draw()
+        enemise.draw_box()
+
+    for enemise in HighEnemyList :
         enemise.draw()
         enemise.draw_box()
 
@@ -308,6 +358,9 @@ def draw_stage_scene():
         e_bullet.draw_box()
 
     for explosions in ExplosionList :
+        explosions.draw()
+
+    for explosions in BigExplosionList :
         explosions.draw()
 
     for powerItem in PowerItemList :
@@ -329,6 +382,29 @@ def draw(frame_time):
     draw_stage_scene()
     score.draw()
     update_canvas()
+
+
+
+def handle_events(frame_time):
+    global player, isBullet_On
+
+    events = get_events()
+    for event in events:
+        if event.type == SDL_QUIT:
+            Game_FrameWork.quit()
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
+            Game_FrameWork.push_state(pause_state)
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
+            isBullet_On = True
+        elif (event.type, event.key) == (SDL_KEYUP, SDLK_SPACE):
+            isBullet_On = False
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
+            if player.HP <=0:
+                 player.revive()
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_0):
+            player.set_damage(180)
+        else:
+            player.handle_event(event)
 
 
 def pause():

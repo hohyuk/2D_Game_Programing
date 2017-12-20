@@ -21,14 +21,13 @@ class Player:
     STAND, BACK, FORWARD, LEFT, RIGHT = 0, 1, 2, 3, 4
 
     image = None
-    missileSound = None
 
     def __init__(self):
         self.frame = 0
         self.state = self.STAND
         self.x, self.y = 400, 90
         self.xDir, self. yDir = 0, 0
-        self.HP = 10
+        self.HP = 180
         self.HpBar = PlayerHpBar()
         self.HpGauge = PlayerHpGauge()
         self.boomUI = BoomUI()
@@ -37,10 +36,6 @@ class Player:
         self.isDie = False        #  player 폭발이 끝나고 죽으면 true
         self.upgrade_missile = True    # True = 기본 False = Special
         Player.image = load_image('image/player/player.png')
-
-        if Player.missileSound == None:
-            Player.missileSound = load_wav('sound/Missile.wav')
-            Player.missileSound.set_volume(64)
 
     def update(self, frame_time):
         if self.HP > 0 :
@@ -129,7 +124,6 @@ class Player:
         self.boomUI.draw(self.boomCount)
 
     def get_pos(self):
-        self.missileSound.play()
         return self.x, self.y
 
     def set_damage(self, damage):

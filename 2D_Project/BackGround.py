@@ -19,7 +19,7 @@ class BackGround:
         self.x1, self.y1 = self.width / 2, self.height / 2           # 화면 초기값. stage1_01 초기값.
         self.x2, self.y2 = self.width / 2, self.height / 2 + 600     # stage1_02화면 초기값.
         self.x3, self.y3 = self.width / 2, self.height / 2 + 600     # stage1_02화면 초기값.
-        self.move = 0.2
+        self.move = 0.3
 
     def update(self, frame_time):
         if self.y1 > -(self.height / 2):
