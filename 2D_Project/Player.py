@@ -28,13 +28,13 @@ class Player:
         self.state = self.STAND
         self.x, self.y = 400, 90
         self.xDir, self. yDir = 0, 0
-        self.HP = 180
+        self.HP = 10
         self.HpBar = PlayerHpBar()
         self.HpGauge = PlayerHpGauge()
         self.boomUI = BoomUI()
         self.boomCount = 0 # 필살기 횟수
         self.Explosion = None
-        self.isExplosion = False
+        self.isDie = False        #  player 폭발이 끝나고 죽으면 true
         self.upgrade_missile = True    # True = 기본 False = Special
         Player.image = load_image('image/player/player.png')
 
@@ -120,7 +120,10 @@ class Player:
             self.image.clip_draw(self.frame * Player.PLAYER_SIZE, self.state * Player.PLAYER_SIZE
                              , Player.PLAYER_SIZE, Player.PLAYER_SIZE, self.x, self.y)
         elif self.Explosion != None:
-            self.Explosion.draw()
+            if self.Explosion.frame < 6 :
+                self.Explosion.draw()
+            else:
+                self.isDie = True
         self.HpBar.draw()
         self.HpGauge.draw(self.HP)
         self.boomUI.draw(self.boomCount)

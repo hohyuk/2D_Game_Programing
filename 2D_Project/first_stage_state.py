@@ -113,7 +113,7 @@ def update(frame_time):
                 PLAYER_MISSILES.append(left_missile)
                 PLAYER_MISSILES.append(right_missile)
                 missileCreateTime = 0
-    else:
+    elif player.isDie:
         Game_FrameWork.push_state(Game_Over_state)
 
     background.update(frame_time)

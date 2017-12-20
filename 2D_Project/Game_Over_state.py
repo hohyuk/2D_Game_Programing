@@ -49,11 +49,9 @@ def handle_events(frame_time):
         if event.type == SDL_QUIT:
             Game_FrameWork.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
-            first_stage_state.player.HP = 180
+            first_stage_state.player.revive()
             Game_FrameWork.pop_state()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_2):
-            Game_FrameWork.pop_state()
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_3):
             Game_FrameWork.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
             Game_FrameWork.pop_state()
