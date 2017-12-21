@@ -9,10 +9,12 @@ from Enemy import *
 from Explosion import *
 from Score import *
 from Item import *
+from BombAirplan import *
 import Game_FrameWork
 import logo_state
 import pause_state
 import Game_Over_state
+
 name = "FirstStageState"
 
 StageTime = 0        # 게임 시작
@@ -42,9 +44,13 @@ PowerItemTime = 0
 BombItemList = None
 BombItemTime = 0
 
+# 필살기
+BombAirplanList = None
+BombAirplanTime = 0
+
 def init_object():
     global StageTime, background, player, score, PowerItemList, BombItemList
-    global PLAYER_MISSILES
+    global PLAYER_MISSILES, BombAirplanList
     global LowEnemyList, ENEMY_MISSILE_LIST, MiddleEnemyList, HighEnemyList
     global BigExplosionList, ExplosionList
 
@@ -64,6 +70,8 @@ def init_object():
     PowerItemList = []
     BombItemList = []
 
+    BombAirplanList = []
+
     StageTime = 0
 
 def enter():
@@ -73,7 +81,7 @@ def enter():
 
 def exit():
     global background, score, player
-    global PLAYER_MISSILES
+    global PLAYER_MISSILES, BombAirplanList
     global LowEnemyList, ENEMY_MISSILE_LIST, MiddleEnemyList, HighEnemyList
     global BigExplosionList, ExplosionList
 
@@ -82,6 +90,7 @@ def exit():
     del player
 
     del PLAYER_MISSILES
+    del BombAirplanList
 
     del LowEnemyList
     del ENEMY_MISSILE_LIST
@@ -89,6 +98,7 @@ def exit():
     del BigExplosionList
     del MiddleEnemyList
     del HighEnemyList
+
 
 def update(frame_time):
     global StageTime
@@ -146,20 +156,6 @@ def update(frame_time):
                 score.setScore(10)
 
     for object in PLAYER_MISSILES:
-        for enemise in HighEnemyList :
-            if highEnemyCollision(object, enemise):
-                PLAYER_MISSILES.remove(object)
-                explosion = EnemyExplosion(object.x, object.y)
-                ExplosionList.append(explosion)
-                if enemise.HP >= 0 :
-                    enemise.set_damage(10)
-                else :
-                    score.setScore(30)
-                    explosion = BigExplosion(enemise.x, enemise.y)
-                    BigExplosionList.append(explosion)
-                    HighEnemyList.remove(enemise)
-
-    for object in PLAYER_MISSILES:
         for enemise in HighEnemyList:
             if collision(object, enemise):
                 PLAYER_MISSILES.remove(object)
@@ -179,6 +175,32 @@ def update(frame_time):
             if player.HP > 0 :
                 player.set_damage(10)
 
+    # 필살기------------------------------------------------------------------
+    for bomb in BombAirplanList :
+        for enemise in LowEnemyList :
+            if collision(bomb, enemise) :
+                explosion = EnemyExplosion(enemise.x,enemise.y)
+                ExplosionList.append(explosion)
+                LowEnemyList.remove(enemise)
+                score.setScore(5)
+        for enemise in MiddleEnemyList :
+            if collision(bomb, enemise) :
+                explosion = EnemyExplosion(enemise.x,enemise.y)
+                ExplosionList.append(explosion)
+                MiddleEnemyList.remove(enemise)
+                score.setScore(10)
+        for enemise in HighEnemyList:
+            if collision(bomb, enemise):
+                explosion = BigExplosion(enemise.x, enemise.y)
+                BigExplosionList.append(explosion)
+                HighEnemyList.remove(enemise)
+                score.setScore(30)
+        for missileIter in ENEMY_MISSILE_LIST:
+            if collision(bomb, missileIter):
+                ENEMY_MISSILE_LIST.remove(missileIter)
+                score.setScore(1)
+    # ------------------------------------------------------------------------
+
     for explosions in ExplosionList :
         isDel = explosions.update(frame_time)
         if isDel == True:
@@ -196,7 +218,7 @@ def update(frame_time):
             player.change_Missile()
 
     for bombitem in BombItemList:
-        if collision(bombitem,player) :
+        if collision(bombitem, player) :
             bombitem.itemSound.play()
             BombItemList.remove(bombitem)
             player.set_bombItem(1)
@@ -299,6 +321,11 @@ def missileObjects(frame_time):
         if isDel == True :
             ENEMY_MISSILE_LIST.remove(object)
 
+    #필살기
+    for object in BombAirplanList :
+        isDel = object.update(frame_time)
+        if isDel == True :
+            BombAirplanList.remove(object)
 
 def itemObjects(frame_time):
     for object in PowerItemList :
@@ -322,18 +349,6 @@ def collision(a, b):
     if right_a < left_b : return False
     if top_a < bottom_b : return False
     if bottom_a > top_b : return False
-
-    return True
-
-
-def highEnemyCollision(a, b):
-    left_a, bottom_a, right_a, top_a = a.get_size()
-    left_b, bottom_b, right_b, top_b = b.get_bodysize()
-
-    if left_a > right_b: return False
-    if right_a < left_b: return False
-    if top_a < bottom_b: return False
-    if bottom_a > top_b: return False
 
     return True
 
@@ -369,6 +384,10 @@ def draw_stage_scene():
     for bombItem in BombItemList :
         bombItem.draw()
 
+    for bomb in BombAirplanList :
+        bomb.draw()
+        bomb.draw_box()
+
     player.draw()
     player.draw_box()
 
@@ -401,8 +420,11 @@ def handle_events(frame_time):
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
             if player.HP <=0:
                  player.revive()
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_0):
-            player.set_damage(180)
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_z):
+            if player.boomCount > 0 :
+                bombAirplan = BombAirplan()
+                BombAirplanList.append(bombAirplan)
+                player.set_bombItem(-1)
         else:
             player.handle_event(event)
 

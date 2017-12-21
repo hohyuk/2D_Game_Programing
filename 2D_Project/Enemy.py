@@ -178,9 +178,5 @@ class HighEnemy:
     def get_size(self):
         return self.x - self.SIZEX/2, self.y - self.SIZEY/5, self.x + self.SIZEX/2, self.y + self.SIZEY/4
 
-    def get_bodysize(self):
-        return self.x - self.SIZEX/5, self.y - self.SIZEY/2, self.x + self.SIZEX/5, self.y + self.SIZEY/4
-
     def draw_box(self):
         draw_rectangle(*self.get_size())
-        draw_rectangle(*self.get_bodysize())

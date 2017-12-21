@@ -105,10 +105,6 @@ class Player:
                 self.frame = 0
                 self.xDir = 0
                 self.yDir = 0
-        # 필살기
-        if (event.type, event.key) == (SDL_KEYDOWN, SDLK_z):
-            if self.boomCount>0:
-                self.boomCount -= 1
 
     def draw(self):
         if self.HP > 0:
