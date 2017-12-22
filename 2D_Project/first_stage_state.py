@@ -10,6 +10,7 @@ from Explosion import *
 from Score import *
 from Item import *
 from BombAirplan import *
+from Boss import *
 import Game_FrameWork
 import logo_state
 import pause_state
@@ -21,7 +22,9 @@ StageTime = 0        # 게임 시작
 score = None
 background = None
 player = None
-
+boss = None
+BossCreateTime = 5  # 보스 생성 시간
+BossCreate = False  # True면 보스 생성
 # List
 PLAYER_MISSILES = None
 
@@ -80,7 +83,7 @@ def enter():
 
 
 def exit():
-    global background, score, player
+    global background, score, player, boss
     global PLAYER_MISSILES, BombAirplanList
     global LowEnemyList, ENEMY_MISSILE_LIST, MiddleEnemyList, HighEnemyList
     global BigExplosionList, ExplosionList
@@ -98,12 +101,13 @@ def exit():
     del BigExplosionList
     del MiddleEnemyList
     del HighEnemyList
-
+    del boss
 
 def update(frame_time):
     global StageTime
     global isBullet_On, enemy_missile, enemy
     global missileCreateTime, PowerItemList
+    global BossCreate
 
     # createUpdate---------------------------------
     createEnemy(frame_time)
@@ -133,6 +137,9 @@ def update(frame_time):
     elif player.isDie:
         Game_FrameWork.push_state(Game_Over_state)
 
+    if BossCreate :
+        boss.update(frame_time)
+
     background.update(frame_time)
     missileObjects(frame_time)
     itemObjects(frame_time)
@@ -155,8 +162,8 @@ def update(frame_time):
                 MiddleEnemyList.remove(enemise)
                 score.setScore(10)
 
-    for object in PLAYER_MISSILES:
-        for enemise in HighEnemyList:
+    for enemise in HighEnemyList:
+        for object in PLAYER_MISSILES:
             if collision(object, enemise):
                 PLAYER_MISSILES.remove(object)
                 explosion = EnemyExplosion(object.x, object.y)
@@ -227,7 +234,7 @@ def update(frame_time):
 def createEnemy(frame_time):
     global StageTime
     global enemyCreateTime, midEnemyCreateTime, highEnemyCreateTime
-
+    global boss, BossCreate, BossCreateTime
     enemyCreateTime += frame_time
     midEnemyCreateTime += frame_time
     highEnemyCreateTime += frame_time
@@ -263,6 +270,12 @@ def createEnemy(frame_time):
             HighEnemyList.append(highEnemy)
             highEnemyCreateTime = 0
 
+    if StageTime > BossCreateTime :
+        if BossCreate == False :
+            boss = Boss()
+            background.bgm.stop()
+            background.bossBgm.repeat_play()
+            BossCreate = True
 
 
 def createItem(frame_time):
@@ -388,6 +401,8 @@ def draw_stage_scene():
         bomb.draw()
         bomb.draw_box()
 
+    if BossCreate :
+        boss.draw()
     player.draw()
     player.draw_box()
 
@@ -417,9 +432,6 @@ def handle_events(frame_time):
             isBullet_On = True
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_SPACE):
             isBullet_On = False
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
-            if player.HP <=0:
-                 player.revive()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_z):
             if player.boomCount > 0 :
                 bombAirplan = BombAirplan()
