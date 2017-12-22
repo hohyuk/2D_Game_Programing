@@ -11,11 +11,12 @@ from Score import *
 from Item import *
 from BombAirplan import *
 from Boss import *
+
 import Game_FrameWork
 import logo_state
 import pause_state
 import Game_Over_state
-
+import Finish
 name = "FirstStageState"
 
 StageTime = 0        # 게임 시작
@@ -23,8 +24,9 @@ score = None
 background = None
 player = None
 boss = None
-BossCreateTime = 5  # 보스 생성 시간
+BossCreateTime = 40  # 보스 생성 시간
 BossCreate = False  # True면 보스 생성
+
 # List
 PLAYER_MISSILES = None
 
@@ -51,11 +53,12 @@ BombItemTime = 0
 BombAirplanList = None
 BombAirplanTime = 0
 
+FINISH = None
 def init_object():
     global StageTime, background, player, score, PowerItemList, BombItemList
     global PLAYER_MISSILES, BombAirplanList
     global LowEnemyList, ENEMY_MISSILE_LIST, MiddleEnemyList, HighEnemyList
-    global BigExplosionList, ExplosionList
+    global BigExplosionList, ExplosionList, FINISH
 
     background = BackGround()
     score = Score()
@@ -76,6 +79,7 @@ def init_object():
     BombAirplanList = []
 
     StageTime = 0
+    FINISH = False
 
 def enter():
     Game_FrameWork.reset_time()
@@ -104,7 +108,7 @@ def exit():
     del boss
 
 def update(frame_time):
-    global StageTime
+    global StageTime, FINISH
     global isBullet_On, enemy_missile, enemy
     global missileCreateTime, PowerItemList
     global BossCreate
@@ -138,7 +142,12 @@ def update(frame_time):
         Game_FrameWork.push_state(Game_Over_state)
 
     if BossCreate :
-        boss.update(frame_time)
+        if boss.HP <=0 :
+            FINISH = True
+        if boss.isDie:
+            Game_FrameWork.push_state(Finish)
+        else:
+            boss.update(frame_time)
 
     background.update(frame_time)
     missileObjects(frame_time)
@@ -175,15 +184,30 @@ def update(frame_time):
                     explosion = BigExplosion(enemise.x, enemise.y)
                     BigExplosionList.append(explosion)
                     HighEnemyList.remove(enemise)
+    if BossCreate :
+        for object in PLAYER_MISSILES:
+            if collision(object, boss):
+                PLAYER_MISSILES.remove(object)
+                explosion = EnemyExplosion(object.x, object.y)
+                ExplosionList.append(explosion)
+                if boss.HP >= 0 :
+                    boss.set_damage(10)
 
     for missileIter in ENEMY_MISSILE_LIST:
-        if collision(missileIter, player) :
-            ENEMY_MISSILE_LIST.remove(missileIter)
-            if player.HP > 0 :
-                player.set_damage(10)
+        if not FINISH :
+            if collision(missileIter, player):
+                ENEMY_MISSILE_LIST.remove(missileIter)
+                if player.HP > 0:
+                    player.set_damage(10)
+
 
     # 필살기------------------------------------------------------------------
     for bomb in BombAirplanList :
+        if collision(bomb, boss):
+            explosion = BigExplosion(boss.x, boss.y)
+            BigExplosionList.append(explosion)
+            boss.set_damage(1)
+
         for enemise in LowEnemyList :
             if collision(bomb, enemise) :
                 explosion = EnemyExplosion(enemise.x,enemise.y)
@@ -264,7 +288,7 @@ def createEnemy(frame_time):
             MiddleEnemyList.append(midEnemy1)
             midEnemyCreateTime = 0
 
-    if StageTime > 2 :
+    if StageTime > 30 :
         if highEnemyCreateTime >= 5.0 :
             highEnemy = HighEnemy()
             HighEnemyList.append(highEnemy)
@@ -328,6 +352,20 @@ def missileObjects(frame_time):
             object.setMissileTime(0)
         if isDel == True:
             HighEnemyList.remove(object)
+
+    if BossCreate and boss.HP > 0:
+        if boss.specialAttack and boss.Time > 1.5:
+            for rad in range(0, 36):
+                bossmissile = RotateMissile(boss.x, boss.y, rad)
+                ENEMY_MISSILE_LIST.append(bossmissile)
+                boss.Time = 0
+        elif (not boss.specialAttack) and boss.Time > 0.5:
+            boss_missile1 = MagicMissile(*boss.get_left_pos())
+            boss_missile2 = MagicMissile(*boss.get_right_pos())
+            ENEMY_MISSILE_LIST.append(boss_missile1)
+            ENEMY_MISSILE_LIST.append(boss_missile2)
+            boss.Time = 0
+
 
     for object in ENEMY_MISSILE_LIST :
         isDel = object.update(frame_time)
@@ -403,6 +441,7 @@ def draw_stage_scene():
 
     if BossCreate :
         boss.draw()
+        boss.draw_box()
     player.draw()
     player.draw_box()
 

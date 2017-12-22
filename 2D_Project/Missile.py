@@ -1,4 +1,4 @@
-
+import math
 from pico2d import *
 import Game_FrameWork
 
@@ -128,3 +128,42 @@ class MagicMissile(Missile):
 
     def draw_box(self):
         draw_rectangle(*self.get_size())
+
+
+class RotateMissile:
+    MISSILE_HALF_SIZE_X = 10
+    MISSILE_HALF_SIZE_Y = 15
+    PIXEL_PER_METER = (10.0 / 1.5)  # 10 pixel 1.5m
+    MISSILE_SPEED_KMPH = 500.0  # 약 500km
+    MISSILE_SPEED_MPM = (MISSILE_SPEED_KMPH * 1000.0 / 60.0)
+    MISSILE_SPEED_MPS = (MISSILE_SPEED_MPM / 60.0)
+    MISSILE_SPEED_PPS = (MISSILE_SPEED_MPS * PIXEL_PER_METER)
+    def __init__(self, posx, posy, rad):
+        self.posX, self.posY =posx, posy
+        self.x, self.y = 0, 0
+        self.rad = rad * 10
+        self.speed = 1
+        self.distance = 0
+        RotateMissile.image = load_image('image/missile/Missile_Enemy01.png')
+        RotateMissile.time = 0
+
+    def update(self, frame_time):
+        rotate_missile_distance = RotateMissile.MISSILE_SPEED_PPS * frame_time
+        self.distance += self.speed
+
+        self.x = self.posX + math.cos(self.rad * math.pi / 180) * self.distance
+        self.y = self.posY + math.sin(self.rad * math.pi / 180) * self.distance
+        if self.distance > 600:
+            return True
+        else:
+            return False
+
+    def get_size(self):
+        return self.x - self.MISSILE_HALF_SIZE_X, self.y - self.MISSILE_HALF_SIZE_Y, self.x + \
+               self.MISSILE_HALF_SIZE_X, self.y + self.MISSILE_HALF_SIZE_Y
+
+    def draw_box(self):
+        draw_rectangle(*self.get_size())
+
+    def draw(self):
+        self.image.draw(self.x, self.y)
