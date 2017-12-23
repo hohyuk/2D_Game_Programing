@@ -24,7 +24,7 @@ score = None
 background = None
 player = None
 boss = None
-BossCreateTime = 40  # 보스 생성 시간
+BossCreateTime = 50  # 보스 생성 시간
 BossCreate = False  # True면 보스 생성
 
 # List
@@ -203,10 +203,11 @@ def update(frame_time):
 
     # 필살기------------------------------------------------------------------
     for bomb in BombAirplanList :
-        if collision(bomb, boss):
-            explosion = BigExplosion(boss.x, boss.y)
-            BigExplosionList.append(explosion)
-            boss.set_damage(1)
+        if BossCreate:
+            if collision(bomb, boss):
+                explosion = BigExplosion(boss.x, boss.y)
+                BigExplosionList.append(explosion)
+                boss.set_damage(1)
 
         for enemise in LowEnemyList :
             if collision(bomb, enemise) :
@@ -307,12 +308,12 @@ def createItem(frame_time):
     PowerItemTime += frame_time
     BombItemTime += frame_time
 
-    if PowerItemTime > 3 :
+    if PowerItemTime > 7 :
         item = PowerItem()
         PowerItemList.append(item)
         PowerItemTime = 0
 
-    if BombItemTime > 3 :
+    if BombItemTime > 10 :
         item = BombItem()
         BombItemList.append(item)
         BombItemTime = 0
@@ -409,19 +410,19 @@ def draw_stage_scene():
 
     for enemise in LowEnemyList :
         enemise.draw()
-        enemise.draw_box()
+        #enemise.draw_box()
 
     for enemise in MiddleEnemyList :
         enemise.draw()
-        enemise.draw_box()
+        #enemise.draw_box()
 
     for enemise in HighEnemyList :
         enemise.draw()
-        enemise.draw_box()
+        #enemise.draw_box()
 
     for e_bullet in ENEMY_MISSILE_LIST :
         e_bullet.draw()
-        e_bullet.draw_box()
+        #e_bullet.draw_box()
 
     for explosions in ExplosionList :
         explosions.draw()
@@ -437,17 +438,17 @@ def draw_stage_scene():
 
     for bomb in BombAirplanList :
         bomb.draw()
-        bomb.draw_box()
+        #bomb.draw_box()
 
     if BossCreate :
         boss.draw()
-        boss.draw_box()
+        #boss.draw_box()
     player.draw()
-    player.draw_box()
+    #player.draw_box()
 
     for player_missile in PLAYER_MISSILES:
         player_missile.draw()
-        player_missile.draw_box()
+        #player_missile.draw_box()
 
 
 def draw(frame_time):

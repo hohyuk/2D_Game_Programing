@@ -153,7 +153,7 @@ class RotateMissile:
 
         self.x = self.posX + math.cos(self.rad * math.pi / 180) * self.distance
         self.y = self.posY + math.sin(self.rad * math.pi / 180) * self.distance
-        if self.distance > 600:
+        if self.distance > 800:
             return True
         else:
             return False

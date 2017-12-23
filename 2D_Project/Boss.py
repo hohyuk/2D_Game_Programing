@@ -21,7 +21,7 @@ class Boss:
 
     def __init__(self):
         self.x, self.y = 400, 800
-        self.HP = 200
+        self.HP = 500
         self.stateTime = 0
         self.moveTime = 0
         self.Time = 0
