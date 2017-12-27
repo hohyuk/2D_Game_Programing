@@ -31,7 +31,7 @@ def draw(frame_time):
     first_stage_state.draw_stage_scene()
     image.clip_draw_to_origin(0, 0, 1000, 300, 0, 300, 800, 300)
 
-    font.draw(250,150,"1. 이어하기     2. 종료",(255,0,255))
+    font.draw(250,150,"1. 새로하기     2. 종료",(255,0,255))
     ScoreFont.draw(200, 250, " SCORE : %d" % (first_stage_state.score.score), (0, 0, 255))
     ScoreFont.draw(200, 300, " TIME : %02d" % (first_stage_state.score.Time), (255, 255, 0))
     update_canvas()
@@ -43,8 +43,7 @@ def handle_events(frame_time):
         if event.type == SDL_QUIT:
             Game_FrameWork.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
-            first_stage_state.player.revive()
-            Game_FrameWork.pop_state()
+            Game_FrameWork.change_state(first_stage_state)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_2):
             Game_FrameWork.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
