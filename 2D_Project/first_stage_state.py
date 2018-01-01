@@ -54,11 +54,14 @@ BombAirplanList = None
 BombAirplanTime = 0
 
 FINISH = None
+
+
 def init_object():
     global StageTime, background, player, score, PowerItemList, BombItemList
     global PLAYER_MISSILES, BombAirplanList
     global LowEnemyList, ENEMY_MISSILE_LIST, MiddleEnemyList, HighEnemyList
     global BigExplosionList, ExplosionList, FINISH, BossCreateTime, BossCreate
+    global enemyCreateTime, midEnemyCreateTime, highEnemyCreateTime, missileCreateTime, PowerItemTime, BombItemTime
 
     background = BackGround()
     score = Score()
@@ -80,8 +83,15 @@ def init_object():
 
     StageTime = 0
     BossCreateTime = 50
+    enemyCreateTime = 0
+    midEnemyCreateTime = 0
+    highEnemyCreateTime = 0
+    missileCreateTime = 0
+    PowerItemTime = 0
+    BombItemTime = 0
     FINISH = False
     BossCreate = False
+
 
 def enter():
     Game_FrameWork.reset_time()
@@ -108,13 +118,12 @@ def exit():
     del MiddleEnemyList
     del HighEnemyList
     del boss
-
     BossCreate = False
     FINISH = False
 
 
 def update(frame_time):
-    global StageTime, FINISH
+    global StageTime, FINISH, boss
     global isBullet_On, enemy_missile, enemy
     global missileCreateTime, PowerItemList
     global BossCreate

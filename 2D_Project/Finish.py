@@ -43,6 +43,7 @@ def handle_events(frame_time):
         if event.type == SDL_QUIT:
             Game_FrameWork.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
+            first_stage_state.exit()
             Game_FrameWork.change_state(first_stage_state)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_2):
             Game_FrameWork.quit()
